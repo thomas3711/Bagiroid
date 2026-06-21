@@ -16,7 +16,7 @@ Ball::Ball(int new_radius)
 
 Ball::~Ball()
 {
-    Game::GetInstance()->GetScene()->RemoveBall(this);
+    
 }
 
 void Ball::SetPosition(SDL_FPoint& target_position)
@@ -56,7 +56,11 @@ void Ball::Update(float delta_time)
     }
 
     // Check collision and bounce against paddle
-    const SDL_FRect& paddle = Game::GetInstance()->GetScene()->GetPaddle().GetRectangle();
+    SDL_FRect paddle = Game::GetInstance()->GetScene()->GetPaddle().GetRectangle();
+    // Squash the paddle rectangle so we don't bounce from sides.
+    // As it caues all sorts of weird ball bounce behaviour in
+    // extremes that I don't want to deal with.
+    paddle.h = 0;
 
     if(isCollidingWithRect(paddle))
     {

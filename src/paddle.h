@@ -6,7 +6,7 @@ class Paddle
 {
     const int width = 150;
     const int height = 10;
-    const float speed = 600.0f;
+    const float speed = 800.0f;
     const int color = 192;
 
     int x_min_pos;
@@ -30,7 +30,7 @@ public:
     float GetWidth() { return width; };
 
     void GiveBall();
-    const SDL_FRect& GetRectangle() { return rectangle; };
+    SDL_FRect GetRectangle() { return rectangle; };
 
     void SetControlState(bool state) { control_enabled = state; };
 

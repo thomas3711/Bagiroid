@@ -3,7 +3,7 @@
 
 class Ball
 {
-    float speed = 600.0f;
+    float speed = 800.0f;
     
     int radius = default_radius;
     bool alive = false;
@@ -17,7 +17,7 @@ class Ball
     void bounceOffPaddle(const SDL_FRect& paddle);
     SDL_FPoint getRectCollisionNormal(const SDL_FRect& rect);
 
-    const int default_radius = 12;
+    const int default_radius = 8;
 
 public:
 

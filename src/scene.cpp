@@ -80,6 +80,25 @@ void Scene::RemoveBall(Ball* ball_to_remove)
     }
 }
 
+void Scene::RemoveAllBalls()
+{
+    // Balls
+    for(int i = 0; i < balls.size(); i++)
+    {
+        auto ball = balls[i];
+
+        if(ball == nullptr)
+        {
+            SDL_Log("Error: null pointer ball: (%d)", i);
+            break;
+        }
+
+        delete ball;
+    }
+
+    balls.clear();
+}
+
 void Scene::RespawnAllBricks()
 {
     for(int i = 0; i < bricks.size(); i++)
@@ -94,4 +113,27 @@ void Scene::RespawnAllBricks()
 
         brick->Respawn();
     }
+}
+
+int Scene::GetAliveBricksCount()
+{
+    int total_alive_bricks = 0;
+
+    for(int i = 0; i < bricks.size(); i++)
+    {
+        auto brick = bricks[i];
+
+        if(brick == nullptr)
+        {
+            SDL_Log("RespawnAllBricks: null brick: %d !", i);
+            continue;
+        }
+
+        if(brick->IsAlive())
+        {
+            total_alive_bricks++;
+        }
+    }
+
+    return total_alive_bricks;
 }

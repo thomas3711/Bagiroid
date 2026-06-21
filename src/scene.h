@@ -24,9 +24,11 @@ public:
 
     void AddBall(Ball* ball_to_add);
     void RemoveBall(Ball* ball_to_remove);
+    void RemoveAllBalls();
 
     void AddBrick(Brick* brick_to_add);
     void RespawnAllBricks();
+    int GetAliveBricksCount();
 
     Paddle& GetPaddle() { return paddle; };
 };

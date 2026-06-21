@@ -6,7 +6,8 @@
 struct Player
 {
     int lives = PLAYER_START_LIVES;
-    double score = 0.0;
+    uint32_t score = 0;
+    uint16_t level = 1;
 };
 
 class Game
@@ -18,6 +19,8 @@ private:
 
     Player player;
 
+    bool running = false;
+
     // --- Singleton
     // Private constructor to prevent instantiation
     Game();
@@ -28,14 +31,19 @@ private:
     // ---
 
     // Brick field
-    const SDL_Point brick_dimensions{.x = 150, .y = 32};
+    const SDL_Point brick_dimensions{.x = 122, .y = 26};
     const SDL_Point brick_spacing{.x = 12, .y = 12};
     const SDL_Point brick_count{.x = 8, .y = 6};
 
     void createBricks();
 
     // Game window
-    const SDL_Color background_color { .r = 30, .g = 30, .b = 30, .a = 255};
+    const SDL_Color game_background_color { .r = 30, .g = 30, .b = 30, .a = 255};
+    const SDL_Color hud_background_color { .r = 45, .g = 45, .b = 45, .a = 255};
+
+    // Game
+    void nextLevel();
+    void playerDied();
 
 public:
     static Game* GetInstance();
@@ -52,9 +60,9 @@ public:
     void NotifyBrickDestruction(Brick* brick);
 
     // TODO: maybe move to some window class, or some global static settings
-    const int window_width = 2120;
-    const int window_height = 1080;
+    const SDL_Rect gameViewport = {0, 0, 1520, 1080};
+    const SDL_Rect hudViewport  = {gameViewport.w, 0, 400, 1080};
 
-    SDL_Rect gameViewport = {0, 0, 1920, 1080};
-    SDL_Rect hudViewport  = {1920, 0, 200, 1080};
+    const int window_width = gameViewport.w + hudViewport.w;
+    const int window_height = 1080;
 };
