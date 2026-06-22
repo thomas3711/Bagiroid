@@ -3,14 +3,14 @@
 
 Paddle::Paddle()
 {
-    rectangle.w = width;
+    rectangle.w = default_width;
     rectangle.h = height;
 
     game_viewport.x = Game::GetInstance()->gameViewport.w;
     game_viewport.y = Game::GetInstance()->gameViewport.h;
 
     x_min_pos = 0;
-    x_max_pos = game_viewport.x - width;
+    x_max_pos = game_viewport.x - rectangle.w;
 
     setStartPosition();
 }
@@ -89,7 +89,7 @@ void Paddle::Update(float delta_time)
 
 void Paddle::setStartPosition()
 {
-    rectangle.x = game_viewport.x / 2;
+    rectangle.x = game_viewport.x / 2 - rectangle.w / 2.0f;
     rectangle.y = game_viewport.y - height * 2;
 }
 
@@ -97,7 +97,7 @@ void Paddle::updateBallPosition()
 {
     if(ball != nullptr)
     {
-        ball_position.x = GetPositionX() + width / 2;
+        ball_position.x = GetPositionX() + rectangle.w / 2;
         ball_position.y = GetPositionY() - ball->GetRadius();
 
         ball->SetPosition(ball_position);
@@ -106,11 +106,36 @@ void Paddle::updateBallPosition()
 
 void Paddle::GiveBall()
 {
-    // TODO: handle paddle having multiple balls in buffer
     if(ball == nullptr)
     {
         ball = new Ball();
 
         updateBallPosition();
     }
+}
+
+void Paddle::ResetToDefault()
+{
+    rectangle.w = default_width;
+    rectangle.h = height;
+
+    speed = default_speed;
+}
+
+void Paddle::IncreaseWidth()
+{
+    rectangle.w += width_increase;
+    rectangle.x -= width_increase / 2.0f;
+
+    // Limit to size of the viewport
+    rectangle.w = SDL_min(rectangle.w, game_viewport.x);
+
+    x_max_pos = game_viewport.x - rectangle.w;
+}
+
+void Paddle::IncreaseSpeed()
+{
+    speed += speed_increase;
+
+    speed = SDL_min(speed, max_speed);
 }

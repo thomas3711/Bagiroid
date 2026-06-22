@@ -4,11 +4,13 @@
 #include "ball.h"
 #include "paddle.h"
 #include "brick.h"
+#include "powerup.h"
 
 class Scene
 {
 private:
     std::vector<Ball*> balls;
+    std::vector<Powerup*> powerups;
     std::vector<Brick*> bricks;
     Paddle paddle = Paddle();
 
@@ -17,8 +19,6 @@ private:
 public:
     Scene();
 
-    std::vector<Brick*>& GetBricks() { return bricks; };
-
     void Update(float delta_time);
     void Render(SDL_Renderer* renderer);
 
@@ -26,9 +26,15 @@ public:
     void RemoveBall(Ball* ball_to_remove);
     void RemoveAllBalls();
 
+    void AddPowerup(Powerup* powerup_to_add);
+    void RemovePowerup(Powerup* powerup_to_remove);
+    void RemoveAllPowerups();
+
     void AddBrick(Brick* brick_to_add);
-    void RespawnAllBricks();
+    void ResetAllBricks();
     int GetAliveBricksCount();
+    Brick* GetBrick(SDL_Point id);
+    std::vector<Brick*>& GetBricks() { return bricks; };
 
     Paddle& GetPaddle() { return paddle; };
 };

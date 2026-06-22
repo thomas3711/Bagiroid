@@ -1,7 +1,7 @@
 #include "brick.h"
 #include "game.h"
 
-Brick::Brick(SDL_FPoint position, SDL_FPoint dimensions, SDL_Color color_p, uint32_t points_p)
+Brick::Brick(SDL_FPoint position, SDL_FPoint dimensions, SDL_Color color_p, uint32_t points_p, SDL_Point id_p)
 {
     rectangle.x = position.x;
     rectangle.y = position.y;
@@ -9,6 +9,7 @@ Brick::Brick(SDL_FPoint position, SDL_FPoint dimensions, SDL_Color color_p, uint
     rectangle.h = dimensions.y;
     color = color_p;
     points = points_p;
+    id = id_p;
 }
 
 void Brick::Render(SDL_Renderer* renderer)
@@ -26,7 +27,13 @@ void Brick::Kill()
     Game::GetInstance()->NotifyBrickDestruction(this);
 }
 
-void Brick::Respawn()
+void Brick::Reset()
 {
+    if(powerup)
+    {
+        delete powerup;
+        powerup = nullptr;
+    }
+    
     alive = true;
 }

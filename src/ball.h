@@ -4,25 +4,26 @@
 class Ball
 {
     float speed = 800.0f;
-    
-    int radius = default_radius;
-    bool alive = false;
+    bool reduce_lives_after_death = true;
+    // All balls will have the same radius allways
+    static const int default_radius = 8;
+    static const int radius_increase = 4;
+    static const int max_radius = 128;
+    static int radius;
 
     SDL_FPoint position;
     SDL_FPoint velocity;
 
     SDL_FPoint checkScreenEdgeCollision();
-    bool isCollidingWithRect(const SDL_FRect& rect);
     void bounce(SDL_FPoint& normal);
     void bounceOffPaddle(const SDL_FRect& paddle);
     SDL_FPoint getRectCollisionNormal(const SDL_FRect& rect);
 
-    const int default_radius = 8;
 
 public:
 
     Ball();
-    Ball(int new_radius);
+    Ball(bool reduce_lives_after_death_p);
     ~Ball();
 
     void Launch(SDL_FPoint& direction);
@@ -32,4 +33,8 @@ public:
     void Update(float delta_time);
 
     int GetRadius() { return radius; };
+    bool GetReduceLives() { return reduce_lives_after_death; };
+
+    void static ResetRadius() { radius = default_radius; }
+    void static IncreaseRadius();
 };

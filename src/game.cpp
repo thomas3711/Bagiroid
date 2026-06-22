@@ -1,5 +1,6 @@
 #include "game.h"
 #include "brick.h"
+#include <vector>
 
 Game *Game::instance = nullptr;
 
@@ -34,7 +35,10 @@ void Game::Initialize()
 
 void Game::Update(float delta_time)
 {
-    scene->Update(delta_time);
+    if(running)
+    {
+        scene->Update(delta_time);
+    }
 
     const bool *keys = SDL_GetKeyboardState(nullptr);
 
@@ -46,7 +50,7 @@ void Game::Update(float delta_time)
         player.level = 1;
         scene->GetPaddle().SetControlState(true);
         scene->GetPaddle().GiveBall();
-        scene->RespawnAllBricks();
+        scene->ResetAllBricks();
         running = true;
     }
 }
@@ -56,7 +60,17 @@ void Game::Render(SDL_Renderer *renderer)
     SDL_SetRenderDrawColor(renderer, game_background_color.r, game_background_color.g, game_background_color.b, game_background_color.a);
     SDL_RenderClear(renderer);
 
-    // Game viewport
+    renderGameViewport(renderer);
+
+    renderHUDViewport(renderer);
+
+    SDL_SetRenderScale(renderer, 1.0f, 1.0f);
+    SDL_SetRenderViewport(renderer, NULL);
+    SDL_RenderPresent(renderer);
+}
+
+void Game::renderGameViewport(SDL_Renderer* renderer)
+{
     if(running)
     {
         SDL_SetRenderViewport(renderer, &gameViewport);
@@ -91,21 +105,21 @@ void Game::Render(SDL_Renderer *renderer)
             msg
         );
     }
+}
 
-    // HUD viewport (reset scale: the !running branch above leaves it at 2.0,
-    // which would push this viewport off-screen)
+void Game::renderHUDViewport(SDL_Renderer* renderer)
+{
     SDL_SetRenderScale(renderer, 1.0f, 1.0f);
     SDL_SetRenderViewport(renderer, &hudViewport);
+
     SDL_SetRenderDrawColor(renderer, hud_background_color.r, hud_background_color.g, hud_background_color.b, hud_background_color.a);
     SDL_FRect hud_background = {0.0f, 0.0f, (float)hudViewport.w, (float)hudViewport.h};
     SDL_RenderFillRect(renderer, &hud_background);
 
-    // Scale up the debug font. NOTE: render scale also scales the viewport
-    // offset/cliprect, so the viewport must be re-set in scaled units or it
-    // gets pushed off-screen.
     const float hud_render_scale = 2.0f;
     SDL_SetRenderScale(renderer, hud_render_scale, hud_render_scale);
 
+    // Render scale, scales the viewport as well
     SDL_Rect scaledViewport = {
         (int)(hudViewport.x / hud_render_scale),
         (int)(hudViewport.y / hud_render_scale),
@@ -127,18 +141,13 @@ void Game::Render(SDL_Renderer *renderer)
         SDL_RenderDebugTextFormat(renderer, 10.0f, text_y_start, "Score: %d", player.score);
         text_y_start += row_spacing;
         SDL_RenderDebugTextFormat(renderer, 10.0f, text_y_start, "Lives: %d", player.lives);
+        text_y_start += row_spacing;
+        SDL_RenderDebugTextFormat(renderer, 10.0f, text_y_start, "Score Multiplier: %dx", player.score_multiplier);
     }
     else
     {
         SDL_RenderDebugTextFormat(renderer, 10.0f, text_y_start, "You are dead !");
     }
-
-    
-
-    // Present render
-    SDL_SetRenderScale(renderer, 1.0f, 1.0f);
-    SDL_SetRenderViewport(renderer, NULL);
-    SDL_RenderPresent(renderer);
 }
 
 // TODO: maybe move to scene ?
@@ -196,15 +205,68 @@ void Game::createBricks()
                 break;
             }
 
-            Brick *brick = new Brick(position, dimensions, color, points);
+            SDL_Point brick_id { .x = x, .y = y };
+            Brick *brick = new Brick(position, dimensions, color, points, brick_id);
+            
             scene->AddBrick(brick);
+        }
+    }
+
+    addPowerupsToBricks();
+}
+
+void Game::addPowerupsToBricks()
+{
+    for (int y = 0; y < brick_count.y; y++)
+    {
+        // For each row pick X distinct random columns that will hold a powerup.
+        int bricks_with_powerup = 8;
+        bricks_with_powerup = SDL_min(bricks_with_powerup, brick_count.x);
+
+        std::vector<int> pool(brick_count.x);
+        for (int i = 0; i < brick_count.x; i++)
+        {
+            pool[i] = i;
+        }
+
+        std::vector<bool> column_has_powerup(brick_count.x, false);
+        for (int i = 0; i < bricks_with_powerup; i++)
+        {
+            int pick = SDL_rand((int)pool.size());
+            column_has_powerup[pool[pick]] = true;
+            pool.erase(pool.begin() + pick);
+        }
+
+        for (int x = 0; x < brick_count.x; x++)
+        {
+            SDL_Point brick_id { .x = x, .y = y };
+            Brick* brick = scene->GetBrick(brick_id);
+
+            // Add powerup if the brick has one
+            if(column_has_powerup[x])
+            {
+                //Powerup* powerup = new Powerup(brick->GetColor(), (Powerup::Type)(brick_count.y - y - 1));
+                Powerup* powerup = new Powerup(brick->GetColor(), Powerup::Type::spawnBalls);
+                
+                brick->SetPowerup(powerup);
+            }
         }
     }
 }
 
 void Game::NotifyBrickDestruction(Brick *brick)
 {
-    player.score += player.level * brick->GetPoints();
+    player.score += player.level * player.score_multiplier * brick->GetPoints();
+
+    Powerup* powerup = brick->GetPowerup();
+
+    if(powerup != nullptr)
+    {
+        SDL_FRect brick_rect = brick->GetRectangle();
+        SDL_FPoint position { .x = brick_rect.x + brick_rect.w / 2.0f, .y = brick_rect.y + brick_rect.h / 2.0f };
+        powerup->Spawn(position);
+        brick->SetPowerup(nullptr);
+    }
 
     if(scene->GetAliveBricksCount() <= 0)
     {
@@ -214,22 +276,25 @@ void Game::NotifyBrickDestruction(Brick *brick)
 
 void Game::NotifyBallDestruction(Ball *ball)
 {
+    if(ball->GetReduceLives())
+    {
+        if (player.lives == 0)
+        {
+            playerDied();
+        }
+        else if (player.lives > 0)
+        {
+            player.lives--;
+            scene->GetPaddle().GiveBall();
+        }
+        else
+        {
+            SDL_Log("Error: Player has negative lives !");
+        }
+    }
+
     Game::GetInstance()->GetScene()->RemoveBall(ball);
     delete ball;
-
-    if (player.lives == 0)
-    {
-        playerDied();
-    }
-    else if (player.lives > 0)
-    {
-        player.lives--;
-        scene->GetPaddle().GiveBall();
-    }
-    else
-    {
-        SDL_Log("Error: Player has negative lives !");
-    }
 }
 
 void Game::nextLevel()
@@ -238,12 +303,52 @@ void Game::nextLevel()
 
     scene->RemoveAllBalls();
     scene->GetPaddle().GiveBall();
-    scene->RespawnAllBricks();
+    scene->ResetAllBricks();
+    addPowerupsToBricks();
 }
 
 void Game::playerDied()
 {
     scene->GetPaddle().SetControlState(false);
     scene->RemoveAllBalls();
+    scene->RemoveAllPowerups();
     running = false;
+}
+
+void Game::restartGame()
+{
+    player.lives = PLAYER_START_LIVES;
+    player.score = 0;
+    player.level = 1;
+    player.score_multiplier = 1;
+    scene->GetPaddle().ResetToDefault();
+    scene->GetPaddle().SetControlState(true);
+    scene->GetPaddle().GiveBall();
+    scene->ResetAllBricks();
+    addPowerupsToBricks();
+    Ball::ResetRadius();
+    running = true;
+}
+
+void Game::SpawnBalls(SDL_FPoint position)
+{
+    const int ball_count = 3;
+    const float angle_step = (2.0f * SDL_PI_F) / ball_count;
+
+    float base_angle = SDL_randf() * 2.0f * SDL_PI_F;
+
+    for (int i = 0; i < ball_count; i++)
+    {
+        float angle = base_angle + i * angle_step;
+
+        Ball* ball = new Ball(false);
+
+        SDL_FPoint spawn_position = position;
+        ball->SetPosition(spawn_position);
+
+        SDL_FPoint direction;
+        direction.x = SDL_cosf(angle);
+        direction.y = SDL_sinf(angle);
+        ball->Launch(direction);
+    }
 }

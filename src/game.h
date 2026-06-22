@@ -6,8 +6,9 @@
 struct Player
 {
     int lives = PLAYER_START_LIVES;
-    uint32_t score = 0;
+    uint64_t score = 0;
     uint16_t level = 1;
+    uint16_t score_multiplier = 1;
 };
 
 class Game
@@ -33,9 +34,11 @@ private:
     // Brick field
     const SDL_Point brick_dimensions{.x = 122, .y = 26};
     const SDL_Point brick_spacing{.x = 12, .y = 12};
-    const SDL_Point brick_count{.x = 8, .y = 6};
+    const SDL_Point brick_count{.x = 1, .y = 6};
+    //const SDL_Point brick_count{.x = 8, .y = 6};
 
     void createBricks();
+    void addPowerupsToBricks();
 
     // Game window
     const SDL_Color game_background_color { .r = 30, .g = 30, .b = 30, .a = 255};
@@ -44,6 +47,11 @@ private:
     // Game
     void nextLevel();
     void playerDied();
+    void restartGame();
+
+    // Render
+    void renderGameViewport(SDL_Renderer* renderer);
+    void renderHUDViewport(SDL_Renderer* renderer);
 
 public:
     static Game* GetInstance();
@@ -54,6 +62,10 @@ public:
     void Initialize();
     void Update(float delta_time);
     void Render(SDL_Renderer* renderer);
+
+    void IncreaseScoreMultiplier() { player.score_multiplier *= 2; };
+    void IncreaseLives() { player.lives++; };
+    void SpawnBalls(SDL_FPoint position);
 
     // TODO: rework to some unified event/message system
     void NotifyBallDestruction(Ball* ball);

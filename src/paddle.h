@@ -4,9 +4,13 @@
 
 class Paddle 
 {
-    const int width = 150;
+    const int default_width = 150;
     const int height = 10;
-    const float speed = 800.0f;
+    const float width_increase = 25;
+    float speed = 800.0f;
+    const float default_speed = 800.0f;
+    const float speed_increase = 100.0f;
+    const float max_speed = 1600.0f;
     const int color = 192;
 
     int x_min_pos;
@@ -25,9 +29,12 @@ public:
     void Render(SDL_Renderer* renderer);
     void Update(float delta_time);
 
+    void ResetToDefault();
+    void IncreaseWidth();
+    void IncreaseSpeed();
+
     float GetPositionX() { return rectangle.x; };
     float GetPositionY() { return rectangle.y; };
-    float GetWidth() { return width; };
 
     void GiveBall();
     SDL_FRect GetRectangle() { return rectangle; };

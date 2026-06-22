@@ -1,22 +1,30 @@
 #include "ball.h"
 #include "game.h"
 #include "draw.h"
+#include "physics.h"
+
+int Ball::radius = Ball::default_radius;
 
 Ball::Ball()
 {
-    radius = default_radius;
     Game::GetInstance()->GetScene()->AddBall(this);
+    reduce_lives_after_death = false;
 }
 
-Ball::Ball(int new_radius)
+Ball::Ball(bool reduce_lives_after_death_p)
 {
-    radius = new_radius;
     Game::GetInstance()->GetScene()->AddBall(this);
+    reduce_lives_after_death = reduce_lives_after_death_p;
 }
 
 Ball::~Ball()
 {
     
+}
+
+void Ball::IncreaseRadius()
+{
+    radius = SDL_min(radius + radius_increase, max_radius);
 }
 
 void Ball::SetPosition(SDL_FPoint& target_position)
@@ -33,8 +41,14 @@ void Ball::Launch(SDL_FPoint& direction)
 
 void Ball::Render(SDL_Renderer* renderer)
 {
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    //DrawCircle(renderer, positionition->x, positionition->y, ball_radius);
+    int gray = 255;
+
+    if(!reduce_lives_after_death)
+    {
+        gray = 192;
+    }
+
+    SDL_SetRenderDrawColor(renderer, gray, gray, gray, gray);
     
     Draw::drawFilledCircle(renderer, position.x, position.y, radius);
 }
@@ -62,7 +76,7 @@ void Ball::Update(float delta_time)
     // extremes that I don't want to deal with.
     paddle.h = 0;
 
-    if(isCollidingWithRect(paddle))
+    if(Physics::isSphereCollidingWithRect(position, radius, paddle))
     {
         // TODO: encapsulate to collider with rectangle (or something so it is not copied in brick check)
         SDL_FPoint normal = getRectCollisionNormal(paddle);
@@ -86,7 +100,7 @@ void Ball::Update(float delta_time)
         auto brick = bricks[i];
         auto rectangle = brick->GetRectangle();
 
-        if(brick->IsAlive() and isCollidingWithRect(rectangle))
+        if(brick->IsAlive() and Physics::isSphereCollidingWithRect(position, radius, rectangle))
         {
             // TODO: encapsulate to collider with rectangle (or something so it is not copied in paddle check)
             SDL_FPoint normal = getRectCollisionNormal(rectangle);
@@ -124,20 +138,6 @@ SDL_FPoint Ball::checkScreenEdgeCollision()
         return {0.0f, -1.0f};     // bottom wall*/
     
     return {0.0f, 0.0f};          // no collision
-}
-
-bool Ball::isCollidingWithRect(const SDL_FRect& rect)
-{
-    // Find closest point on rectangle to circle center
-    float closest_x = SDL_clamp(position.x, rect.x, rect.x + rect.w);
-    float closest_y = SDL_clamp(position.y, rect.y, rect.y + rect.h);
-    
-    // Calculate distance between circle center and closest point
-    float dx = position.x - closest_x;
-    float dy = position.y - closest_y;
-    float distance = SDL_sqrt(dx*dx + dy*dy);
-    
-    return distance < radius;
 }
 
 // Calculate rectangle collision normal
