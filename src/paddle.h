@@ -6,7 +6,7 @@ class Paddle
 {
     const int default_width = 150;
     const int height = 10;
-    const float width_increase = 40;
+    const float width_increase = 30;
     float speed = 800.0f;
     const float default_speed = 800.0f;
     const float speed_increase = 100.0f;
@@ -37,6 +37,7 @@ public:
     float GetPositionY() { return rectangle.y; };
 
     void GiveBall();
+    void ClearHeldBall() { ball = nullptr; };
     SDL_FRect GetRectangle() { return rectangle; };
 
     void SetControlState(bool state) { control_enabled = state; };

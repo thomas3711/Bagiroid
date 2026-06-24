@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL3/SDL.h>
 #include <vector>
+#include <queue>
 #include "object.h"
 #include "paddle.h"
 #include "brick.h"
@@ -9,6 +10,8 @@ class Scene
 {
 private:
     std::vector<Object*> objects;
+
+    std::queue<Object*> destroy_queue;
 
     Paddle paddle = Paddle();
 
@@ -22,9 +25,10 @@ public:
 
     void AddObject(Object* object_to_add);
     void RemoveObject(Object* object_to_remove);
+    void DestroyObject(Object* object_to_destroy);
     
     void ResetAllBricks();
-    int GetAliveBricksCount();
+    int GetActiveBricksCount();
     Brick* GetBrick(SDL_Point id);
     std::vector<Brick*>& GetBricks();
 

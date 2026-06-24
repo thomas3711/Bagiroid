@@ -11,14 +11,13 @@ class Ball : public Object
     static const int max_radius = 128;
     static int radius;
 
-    SDL_FPoint position;
-    SDL_FPoint velocity;
+    SDL_FPoint position { 0.0f, 0.0f };
+    SDL_FPoint velocity { 0.0f, 0.0f };
 
     SDL_FPoint checkScreenEdgeCollision();
     void bounce(SDL_FPoint& normal);
     void bounceOffPaddle(const SDL_FRect& paddle);
     SDL_FPoint getRectCollisionNormal(const SDL_FRect& rect);
-
 
 public:
 
@@ -31,6 +30,7 @@ public:
 
     void Render(SDL_Renderer* renderer) override;
     void Update(float delta_time) override;
+    void Destroy() override;
 
     int GetRadius() { return radius; };
     bool GetReduceLives() { return reduce_lives_after_death; };

@@ -28,7 +28,7 @@ void Powerup::Spawn(SDL_FPoint& position_p)
     if(type == Type::spawnBalls)
     {
         triggerEffect();
-        Kill();
+        Destroy();
     }
 }
 
@@ -64,18 +64,18 @@ void Powerup::Update(float delta_time)
         position.y = closest_y - radius;
 
         triggerEffect();
-        Kill();
+        Destroy();
     }
     else if(position.y > Game::GetInstance()->window_height + radius)
     {
-        Kill();
+        Destroy();
     }
 }
 
-void Powerup::Kill()
+void Powerup::Destroy()
 {
-    Game::GetInstance()->GetScene()->RemoveObject(this);
-    delete this;
+    active = false;
+    Game::GetInstance()->GetScene()->DestroyObject(this);
 }
 
 void Powerup::triggerEffect()
@@ -87,7 +87,7 @@ void Powerup::triggerEffect()
             break;
         case Type::fasterPaddle:
             Game::GetInstance()->GetScene()->GetPaddle().IncreaseSpeed();
-            break;        
+            break;
         case Type::biggerPaddle:
             Game::GetInstance()->GetScene()->GetPaddle().IncreaseWidth();
             break;
@@ -100,8 +100,6 @@ void Powerup::triggerEffect()
         case Type::doublePointModifier:
             Game::GetInstance()->IncreaseScoreMultiplier();
             break;
-        
-
         default:
             break;
     }

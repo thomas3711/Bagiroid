@@ -31,7 +31,7 @@ void Brick::Update(float delta_time)
 
 }
 
-void Brick::Kill()
+void Brick::Destroy()
 {
     SetActive(false);
     Game::GetInstance()->NotifyBrickDestruction(this);

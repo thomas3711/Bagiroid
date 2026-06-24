@@ -22,6 +22,12 @@ Ball::~Ball()
     
 }
 
+void Ball::Destroy()
+{
+    Game::GetInstance()->GetScene()->DestroyObject(this);
+    Game::GetInstance()->NotifyBallDestruction(this);
+}
+
 void Ball::IncreaseRadius()
 {
     radius = SDL_min(radius + radius_increase, max_radius);
@@ -38,6 +44,8 @@ void Ball::Launch(SDL_FPoint& direction)
     velocity.x = direction.x * speed;
     velocity.y = direction.y * speed;
 
+    // Make the powerup balls slower
+    // TODO: do this in a more inteligent customizable way
     if(!reduce_lives_after_death)
     {
         velocity.x /= 2.0f;
@@ -121,14 +129,14 @@ void Ball::Update(float delta_time)
             // Calculate and set bounce velocity
             bounce(normal);
 
-            brick->Kill();
+            brick->Destroy();
         }
     }
 
     // Check if ball is bellow bottom 
     if(position.y > Game::GetInstance()->window_height + radius)
     {
-        Game::GetInstance()->NotifyBallDestruction(this);
+        Destroy();
     }
 }
 

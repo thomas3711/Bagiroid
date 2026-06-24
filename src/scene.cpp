@@ -8,6 +8,7 @@ Scene::Scene()
 
 void Scene::Update(float delta_time)
 {
+    // Update all objects
     for(int i = 0; i < objects.size(); i++)
     {
         auto object = objects[i];
@@ -23,6 +24,15 @@ void Scene::Update(float delta_time)
 
     // Paddle
     paddle.Update(delta_time);
+
+    // Process objects that are to be destroyed
+    while (!destroy_queue.empty())
+    {
+        Object* object = destroy_queue.front();
+        destroy_queue.pop();
+        RemoveObject(object);
+        delete object;
+    }
 }
 
 void Scene::Render(SDL_Renderer* renderer)
@@ -58,6 +68,11 @@ void Scene::RemoveObject(Object* object_to_remove)
     }
 }
 
+void Scene::DestroyObject(Object* object_to_destroy)
+{
+    destroy_queue.push(object_to_destroy);
+}
+
 void Scene::ResetAllBricks()
 {
     auto bricks = GetAllOfType<Brick>();
@@ -76,7 +91,7 @@ void Scene::ResetAllBricks()
     }
 }
 
-int Scene::GetAliveBricksCount()
+int Scene::GetActiveBricksCount()
 {
     auto bricks = GetAllOfType<Brick>();
 

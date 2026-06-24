@@ -22,6 +22,9 @@ private:
 
     bool running = false;
 
+    bool next_level_pending = false;
+    bool player_died_pending = false;
+
     // --- Singleton
     // Private constructor to prevent instantiation
     Game();
@@ -46,7 +49,7 @@ private:
 
     // Game
     void nextLevel();
-    void playerDied();
+    void finalizePlayerDeath();
     void restartGame();
 
     // Render
@@ -63,7 +66,7 @@ public:
     void Update(float delta_time);
     void Render(SDL_Renderer* renderer);
 
-    void IncreaseScoreMultiplier() { player.score_multiplier *= 2; };
+    void IncreaseScoreMultiplier() { player.score_multiplier += 1; };
     void IncreaseLives() { player.lives++; };
     void SpawnBalls(SDL_FPoint position);
 

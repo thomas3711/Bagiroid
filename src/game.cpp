@@ -40,6 +40,18 @@ void Game::Update(float delta_time)
         scene->Update(delta_time);
     }
 
+    if(player_died_pending)
+    {
+        finalizePlayerDeath();
+        player_died_pending = false;
+        next_level_pending = false;
+    }
+    else if(next_level_pending)
+    {
+        nextLevel();
+        next_level_pending = false;
+    }
+
     const bool *keys = SDL_GetKeyboardState(nullptr);
 
     // R - to reset game, when player is dead
@@ -240,8 +252,8 @@ void Game::addPowerupsToBricks()
             // Add powerup if the brick has one
             if(column_has_powerup[x])
             {
-                //Powerup* powerup = new Powerup(brick->GetColor(), (Powerup::Type)(brick_count.y - y - 1));
-                Powerup* powerup = new Powerup(brick->GetColor(), Powerup::Type::spawnBalls);
+                Powerup* powerup = new Powerup(brick->GetColor(), (Powerup::Type)(brick_count.y - y - 1));
+                //Powerup* powerup = new Powerup(brick->GetColor(), Powerup::Type::spawnBalls);
                 
                 brick->SetPowerup(powerup);
             }
@@ -263,9 +275,9 @@ void Game::NotifyBrickDestruction(Brick *brick)
         brick->SetPowerup(nullptr);
     }
 
-    if(scene->GetAliveBricksCount() <= 0)
+    if(scene->GetActiveBricksCount() <= 0)
     {
-        nextLevel();
+        next_level_pending = true;
     }
 }
 
@@ -275,7 +287,7 @@ void Game::NotifyBallDestruction(Ball *ball)
     {
         if (player.lives == 0)
         {
-            playerDied();
+            player_died_pending = true;
         }
         else if (player.lives > 0)
         {
@@ -287,10 +299,6 @@ void Game::NotifyBallDestruction(Ball *ball)
             SDL_Log("Error: Player has negative lives !");
         }
     }
-
-    // TODO: clean-up in ball destructor ?
-    Game::GetInstance()->GetScene()->RemoveObject(ball);
-    delete ball;
 }
 
 void Game::nextLevel()
@@ -298,16 +306,18 @@ void Game::nextLevel()
     player.level++;
 
     scene->DeleteAllOfType<Ball>();
+    scene->GetPaddle().ClearHeldBall();
     scene->GetPaddle().GiveBall();
     scene->ResetAllBricks();
     addPowerupsToBricks();
 }
 
-void Game::playerDied()
+void Game::finalizePlayerDeath()
 {
     scene->GetPaddle().SetControlState(false);
     scene->DeleteAllOfType<Ball>();
     scene->DeleteAllOfType<Powerup>();
+    scene->GetPaddle().ClearHeldBall();
     running = false;
 }
 
@@ -319,6 +329,7 @@ void Game::restartGame()
     player.score_multiplier = 1;
     scene->GetPaddle().ResetToDefault();
     scene->GetPaddle().SetControlState(true);
+    scene->GetPaddle().ClearHeldBall();
     scene->GetPaddle().GiveBall();
     scene->ResetAllBricks();
     addPowerupsToBricks();

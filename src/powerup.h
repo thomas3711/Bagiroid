@@ -33,7 +33,7 @@ public:
     ~Powerup() override;
 
     void Spawn(SDL_FPoint& position_p);
-    void Kill();
+    void Destroy() override;
 
     void Render(SDL_Renderer* renderer) override;
     void Update(float delta_time) override;
