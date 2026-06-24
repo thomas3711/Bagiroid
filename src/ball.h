@@ -1,13 +1,13 @@
 #pragma once
-#include <SDL3/SDL.h>
+#include "object.h"
 
-class Ball
+class Ball : public Object
 {
     float speed = 800.0f;
     bool reduce_lives_after_death = true;
     // All balls will have the same radius allways
     static const int default_radius = 8;
-    static const int radius_increase = 4;
+    static const int radius_increase = 2;
     static const int max_radius = 128;
     static int radius;
 
@@ -24,13 +24,13 @@ public:
 
     Ball();
     Ball(bool reduce_lives_after_death_p);
-    ~Ball();
+    ~Ball() override;
 
     void Launch(SDL_FPoint& direction);
     void SetPosition(SDL_FPoint& target_position);
 
-    void Render(SDL_Renderer* renderer);
-    void Update(float delta_time);
+    void Render(SDL_Renderer* renderer) override;
+    void Update(float delta_time) override;
 
     int GetRadius() { return radius; };
     bool GetReduceLives() { return reduce_lives_after_death; };

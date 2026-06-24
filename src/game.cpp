@@ -45,13 +45,7 @@ void Game::Update(float delta_time)
     // R - to reset game, when player is dead
     if (!running and keys[SDL_SCANCODE_R])
     {
-        player.lives = PLAYER_START_LIVES;
-        player.score = 0;
-        player.level = 1;
-        scene->GetPaddle().SetControlState(true);
-        scene->GetPaddle().GiveBall();
-        scene->ResetAllBricks();
-        running = true;
+        restartGame();
     }
 }
 void Game::Render(SDL_Renderer *renderer)
@@ -208,10 +202,11 @@ void Game::createBricks()
             SDL_Point brick_id { .x = x, .y = y };
             Brick *brick = new Brick(position, dimensions, color, points, brick_id);
             
-            scene->AddBrick(brick);
+            scene->AddObject(brick);
         }
     }
 
+    scene->ResetAllBricks();
     addPowerupsToBricks();
 }
 
@@ -293,7 +288,8 @@ void Game::NotifyBallDestruction(Ball *ball)
         }
     }
 
-    Game::GetInstance()->GetScene()->RemoveBall(ball);
+    // TODO: clean-up in ball destructor ?
+    Game::GetInstance()->GetScene()->RemoveObject(ball);
     delete ball;
 }
 
@@ -301,7 +297,7 @@ void Game::nextLevel()
 {
     player.level++;
 
-    scene->RemoveAllBalls();
+    scene->DeleteAllOfType<Ball>();
     scene->GetPaddle().GiveBall();
     scene->ResetAllBricks();
     addPowerupsToBricks();
@@ -310,8 +306,8 @@ void Game::nextLevel()
 void Game::playerDied()
 {
     scene->GetPaddle().SetControlState(false);
-    scene->RemoveAllBalls();
-    scene->RemoveAllPowerups();
+    scene->DeleteAllOfType<Ball>();
+    scene->DeleteAllOfType<Powerup>();
     running = false;
 }
 

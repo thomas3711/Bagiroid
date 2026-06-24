@@ -8,7 +8,7 @@ Powerup::Powerup(SDL_Color& color_p, Type type_p)
     radius = default_radius;
     color = color_p;
     type = type_p;
-    alive = false;
+    active = false;
 
     speed = default_speed + int(type) * speed_increment;
 }
@@ -20,9 +20,9 @@ Powerup::~Powerup()
 
 void Powerup::Spawn(SDL_FPoint& position_p)
 {
-    alive = true;
+    SetActive(true);
     position = position_p;
-    Game::GetInstance()->GetScene()->AddPowerup(this);
+    Game::GetInstance()->GetScene()->AddObject(this);
 
     // This type of power-up doesn't need to be picked up, just kill it and trigger effect
     if(type == Type::spawnBalls)
@@ -34,7 +34,7 @@ void Powerup::Spawn(SDL_FPoint& position_p)
 
 void Powerup::Render(SDL_Renderer* renderer)
 {
-    if(!alive)
+    if(!active)
     {
         return;
     }
@@ -45,7 +45,7 @@ void Powerup::Render(SDL_Renderer* renderer)
 
 void Powerup::Update(float delta_time)
 {
-    if(!alive)
+    if(!active)
     {
         return;
     }
@@ -74,7 +74,7 @@ void Powerup::Update(float delta_time)
 
 void Powerup::Kill()
 {
-    Game::GetInstance()->GetScene()->RemovePowerup(this);
+    Game::GetInstance()->GetScene()->RemoveObject(this);
     delete this;
 }
 

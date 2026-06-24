@@ -8,164 +8,60 @@ Scene::Scene()
 
 void Scene::Update(float delta_time)
 {
-    if(powerups.size() > 0)
+    for(int i = 0; i < objects.size(); i++)
     {
-        //SDL_Log("Powerups: %d", powerups.size());
+        auto object = objects[i];
+
+        if(object == nullptr)
+        {
+            SDL_Log("Error: null pointer object: (%d)", i);
+            continue;
+        }
+
+        object->Update(delta_time);
     }
 
     // Paddle
     paddle.Update(delta_time);
-
-    // Balls
-    for(int i = 0; i < balls.size(); i++)
-    {
-        auto ball = balls[i];
-
-        if(ball == nullptr)
-        {
-            SDL_Log("Error: null pointer ball: (%d)", i);
-            break;
-        }
-
-        ball->Update(delta_time);
-    }
-
-    // Powerups
-    for(int i = 0; i < powerups.size(); i++)
-    {
-        auto powerup = powerups[i];
-
-        if(powerup == nullptr)
-        {
-            SDL_Log("Error: null pointer powerup: (%d)", i);
-            break;
-        }
-
-        powerup->Update(delta_time);
-    }
 }
 
 void Scene::Render(SDL_Renderer* renderer)
 {
-    // TODO: group all objects with common parent
-
-    // Bricks
-    for(int i = 0; i < bricks.size(); i++)
+    for(int i = 0; i < objects.size(); i++)
     {
-        auto brick = bricks[i];
+        auto object = objects[i];
 
-        if(brick == nullptr)
+        if(object == nullptr)
         {
-            SDL_Log("Error: null pointer brick: (%d)", i);
-            break;
+            SDL_Log("Error: null pointer object: (%d)", i);
+            continue;
         }
 
-        brick->Render(renderer);
-    }
-
-    // Powerups
-    for(int i = 0; i < powerups.size(); i++)
-    {
-        auto powerup = powerups[i];
-
-        if(powerup == nullptr)
-        {
-            SDL_Log("Error: null pointer powerup: (%d)", i);
-            break;
-        }
-
-        powerup->Render(renderer);
-    }
-
-    // Balls
-    for(int i = 0; i < balls.size(); i++)
-    {
-        auto ball = balls[i];
-
-        if(ball == nullptr)
-        {
-            SDL_Log("Error: null pointer ball: (%d)", i);
-            break;
-        }
-
-        ball->Render(renderer);
+        object->Render(renderer);
     }
 
     // Paddle
     paddle.Render(renderer);
 }
 
-void Scene::AddBall(Ball* ball_to_add)
+void Scene::AddObject(Object* object_to_add)
 {
-    balls.push_back(ball_to_add);
+    objects.push_back(object_to_add);
 }
 
-void Scene::AddBrick(Brick* brick_to_add)
+void Scene::RemoveObject(Object* object_to_remove)
 {
-    bricks.push_back(brick_to_add);
-}
-
-void Scene::RemoveBall(Ball* ball_to_remove)
-{
-    auto iterator = std::find(balls.begin(), balls.end(), ball_to_remove);
-    if (iterator != balls.end())
+    auto iterator = std::find(objects.begin(), objects.end(), object_to_remove);
+    if (iterator != objects.end())
     {
-        balls.erase(iterator);
+        objects.erase(iterator);
     }
-}
-
-void Scene::RemoveAllBalls()
-{
-    for(int i = 0; i < balls.size(); i++)
-    {
-        auto ball = balls[i];
-
-        if(ball == nullptr)
-        {
-            SDL_Log("Error: null pointer ball: (%d)", i);
-            continue;
-        }
-
-        delete ball;
-    }
-
-    balls.clear();
-}
-
-void Scene::AddPowerup(Powerup* powerup_to_add)
-{
-    powerups.push_back(powerup_to_add);
-}
-
-void Scene::RemovePowerup(Powerup* powerup_to_remove)
-{
-    auto iterator = std::find(powerups.begin(), powerups.end(), powerup_to_remove);
-    if (iterator != powerups.end())
-    {
-        powerups.erase(iterator);
-    }
-}
-
-void Scene::RemoveAllPowerups()
-{
-    for(int i = 0; i < powerups.size(); i++)
-    {
-        auto powerup = powerups[i];
-
-        if(powerup == nullptr)
-        {
-            SDL_Log("Error: null pointer powerup: (%d)", i);
-            continue;
-        }
-
-        delete powerup;
-    }
-
-    powerups.clear();
 }
 
 void Scene::ResetAllBricks()
 {
+    auto bricks = GetAllOfType<Brick>();
+
     for(int i = 0; i < bricks.size(); i++)
     {
         auto brick = bricks[i];
@@ -182,6 +78,8 @@ void Scene::ResetAllBricks()
 
 int Scene::GetAliveBricksCount()
 {
+    auto bricks = GetAllOfType<Brick>();
+
     int total_alive_bricks = 0;
 
     for(int i = 0; i < bricks.size(); i++)
@@ -194,7 +92,7 @@ int Scene::GetAliveBricksCount()
             continue;
         }
 
-        if(brick->IsAlive())
+        if(brick->IsActive())
         {
             total_alive_bricks++;
         }
@@ -205,6 +103,8 @@ int Scene::GetAliveBricksCount()
 
 Brick* Scene::GetBrick(SDL_Point id)
 {
+    auto bricks = GetAllOfType<Brick>();
+
     for(int i = 0; i < bricks.size(); i++)
     {
         Brick* brick = bricks[i];

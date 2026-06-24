@@ -7,13 +7,13 @@ int Ball::radius = Ball::default_radius;
 
 Ball::Ball()
 {
-    Game::GetInstance()->GetScene()->AddBall(this);
-    reduce_lives_after_death = false;
+    Game::GetInstance()->GetScene()->AddObject(this);
+    reduce_lives_after_death = true;
 }
 
 Ball::Ball(bool reduce_lives_after_death_p)
 {
-    Game::GetInstance()->GetScene()->AddBall(this);
+    Game::GetInstance()->GetScene()->AddObject(this);
     reduce_lives_after_death = reduce_lives_after_death_p;
 }
 
@@ -37,18 +37,24 @@ void Ball::Launch(SDL_FPoint& direction)
 {
     velocity.x = direction.x * speed;
     velocity.y = direction.y * speed;
+
+    if(!reduce_lives_after_death)
+    {
+        velocity.x /= 2.0f;
+        velocity.y /= 2.0f;
+    }
 }
 
 void Ball::Render(SDL_Renderer* renderer)
 {
-    int gray = 255;
+    SDL_Color color = { .r = 255, .g = 255, .b = 255, .a = 255};
 
     if(!reduce_lives_after_death)
     {
-        gray = 192;
+        color = { .r = 255, .g = 255, .b = 0, .a = 255};
     }
 
-    SDL_SetRenderDrawColor(renderer, gray, gray, gray, gray);
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
     
     Draw::drawFilledCircle(renderer, position.x, position.y, radius);
 }
@@ -93,14 +99,14 @@ void Ball::Update(float delta_time)
     }
 
     // Check collision with all bricks
-    auto bricks = Game::GetInstance()->GetScene()->GetBricks();
+    auto bricks = Game::GetInstance()->GetScene()->GetAllOfType<Brick>();
 
     for(int i = 0; i < bricks.size(); i++)
     {
         auto brick = bricks[i];
         auto rectangle = brick->GetRectangle();
 
-        if(brick->IsAlive() and Physics::isSphereCollidingWithRect(position, radius, rectangle))
+        if(brick->IsActive() and Physics::isSphereCollidingWithRect(position, radius, rectangle))
         {
             // TODO: encapsulate to collider with rectangle (or something so it is not copied in paddle check)
             SDL_FPoint normal = getRectCollisionNormal(rectangle);

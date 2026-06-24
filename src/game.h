@@ -8,7 +8,7 @@ struct Player
     int lives = PLAYER_START_LIVES;
     uint64_t score = 0;
     uint16_t level = 1;
-    uint16_t score_multiplier = 1;
+    uint64_t score_multiplier = 1;
 };
 
 class Game
@@ -34,8 +34,8 @@ private:
     // Brick field
     const SDL_Point brick_dimensions{.x = 122, .y = 26};
     const SDL_Point brick_spacing{.x = 12, .y = 12};
-    const SDL_Point brick_count{.x = 1, .y = 6};
-    //const SDL_Point brick_count{.x = 8, .y = 6};
+    //const SDL_Point brick_count{.x = 1, .y = 6};
+    const SDL_Point brick_count{.x = 8, .y = 6};
 
     void createBricks();
     void addPowerupsToBricks();

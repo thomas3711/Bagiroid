@@ -1,7 +1,7 @@
 #pragma once
-#include <SDL3/SDL.h>
+#include "object.h"
 
-class Powerup
+class Powerup : public Object
 {
 public:
     enum Type
@@ -17,7 +17,6 @@ public:
 
 private:
     Type type = Type::none;
-    bool alive = false;
     float speed = 250.0f;
     const float default_speed = 250.0f;
     const float speed_increment = 50.0f;
@@ -31,13 +30,13 @@ private:
 
 public:
     Powerup(SDL_Color& color_p, Type type_p);
-    ~Powerup();
+    ~Powerup() override;
 
     void Spawn(SDL_FPoint& position_p);
     void Kill();
 
-    void Render(SDL_Renderer* renderer);
-    void Update(float delta_time);
+    void Render(SDL_Renderer* renderer) override;
+    void Update(float delta_time) override;
 
     Type GetType() { return type; };
 };
