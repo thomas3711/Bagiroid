@@ -1,6 +1,8 @@
 #include "game.h"
 #include "brick.h"
+#include "draw.h"
 #include <vector>
+#include <string>
 
 Game *Game::instance = nullptr;
 
@@ -139,20 +141,38 @@ void Game::renderHUDViewport(SDL_Renderer* renderer)
 
     const float row_spacing = 16.0f;
     float text_y_start = 10.0f;
+    float text_x_Start = 10.0f;
 
     if(running)
     {
-        SDL_RenderDebugTextFormat(renderer, 10.0f, text_y_start, "Level: %d", player.level);
+        // Stats
+        SDL_RenderDebugTextFormat(renderer, text_x_Start, text_y_start, "Level: %d", player.level);
         text_y_start += row_spacing;
-        SDL_RenderDebugTextFormat(renderer, 10.0f, text_y_start, "Score: %d", player.score);
+        SDL_RenderDebugTextFormat(renderer, text_x_Start, text_y_start, "Score: %d", player.score);
         text_y_start += row_spacing;
-        SDL_RenderDebugTextFormat(renderer, 10.0f, text_y_start, "Lives: %d", player.lives);
+        SDL_RenderDebugTextFormat(renderer, text_x_Start, text_y_start, "Lives: %d", player.lives);
         text_y_start += row_spacing;
-        SDL_RenderDebugTextFormat(renderer, 10.0f, text_y_start, "Score Multiplier: %dx", player.score_multiplier);
+        SDL_RenderDebugTextFormat(renderer, text_x_Start, text_y_start, "Score Multiplier: %dx", player.score_multiplier);
+
+        // Help
+        float hint_row_spacing = 24.0f;
+        int hint_circle_radius = 8;
+        text_y_start = scaledViewport.h - 10.0f - hint_row_spacing * Powerup::Type::COUNT;
+
+        for (int i = 0; i < static_cast<int>(Powerup::Type::COUNT); i++)
+        {
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            std::string description = "- " + Powerup::GetDescription((Powerup::Type)i);
+            SDL_RenderDebugTextFormat(renderer, text_x_Start + hint_circle_radius * 2, text_y_start, description.c_str());
+            SDL_Color color = Brick::GetBrickColor(i);
+            SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+            Draw::drawFilledCircle(renderer, text_x_Start, text_y_start + hint_circle_radius / 2, hint_circle_radius);
+            text_y_start += hint_row_spacing;
+        }
     }
     else
     {
-        SDL_RenderDebugTextFormat(renderer, 10.0f, text_y_start, "You are dead !");
+        SDL_RenderDebugTextFormat(renderer, text_x_Start, text_y_start, "You are dead !");
     }
 }
 
@@ -178,38 +198,8 @@ void Game::createBricks()
             position.x = x * (dimensions.x + brick_spacing.x) + offset.x;
             position.y = y * (dimensions.y + brick_spacing.y) + offset.y;
 
-            // Set color (varies by row for visual effect)
-            switch (y)
-            {
-            case 0:
-                color = {255, 0, 0, 255};
-                points = 32;
-                break; // Red
-            case 1:
-                color = {255, 127, 0, 255};
-                points = 16;
-                break; // Orange
-            case 2:
-                color = {255, 255, 0, 255};
-                points = 8;
-                break; // Yellow
-            case 3:
-                color = {0, 255, 0, 255};
-                points = 4;
-                break; // Green
-            case 4:
-                color = {0, 0, 255, 255};
-                points = 2;
-                break; // Blue
-            case 5:
-                color = {128, 0, 128, 255};
-                points = 1;
-                break; // Purple
-            default:
-                color = {255, 255, 255, 255};
-                points = 0;
-                break;
-            }
+            color = Brick::GetBrickColor(y);
+            points = Brick::GetBrickPoints(y);
 
             SDL_Point brick_id { .x = x, .y = y };
             Brick *brick = new Brick(position, dimensions, color, points, brick_id);
@@ -219,15 +209,15 @@ void Game::createBricks()
     }
 
     scene->ResetAllBricks();
-    addPowerupsToBricks();
+    generatePowerups();
 }
 
-void Game::addPowerupsToBricks()
+void Game::generatePowerups()
 {
     for (int y = 0; y < brick_count.y; y++)
     {
         // For each row pick X distinct random columns that will hold a powerup.
-        int bricks_with_powerup = 8;
+        int bricks_with_powerup = 3;
         bricks_with_powerup = SDL_min(bricks_with_powerup, brick_count.x);
 
         std::vector<int> pool(brick_count.x);
@@ -252,7 +242,7 @@ void Game::addPowerupsToBricks()
             // Add powerup if the brick has one
             if(column_has_powerup[x])
             {
-                Powerup* powerup = new Powerup(brick->GetColor(), (Powerup::Type)(brick_count.y - y - 1));
+                Powerup* powerup = new Powerup(brick->GetColor(), (Powerup::Type)y);
                 //Powerup* powerup = new Powerup(brick->GetColor(), Powerup::Type::spawnBalls);
                 
                 brick->SetPowerup(powerup);
@@ -309,7 +299,7 @@ void Game::nextLevel()
     scene->GetPaddle().ClearHeldBall();
     scene->GetPaddle().GiveBall();
     scene->ResetAllBricks();
-    addPowerupsToBricks();
+    generatePowerups();
 }
 
 void Game::finalizePlayerDeath()
@@ -332,7 +322,7 @@ void Game::restartGame()
     scene->GetPaddle().ClearHeldBall();
     scene->GetPaddle().GiveBall();
     scene->ResetAllBricks();
-    addPowerupsToBricks();
+    generatePowerups();
     Ball::ResetRadius();
     running = true;
 }

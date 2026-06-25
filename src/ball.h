@@ -3,11 +3,11 @@
 
 class Ball : public Object
 {
-    float speed = 800.0f;
+    float speed = 1000.0f;
     bool reduce_lives_after_death = true;
     // All balls will have the same radius allways
     static const int default_radius = 8;
-    static const int radius_increase = 2;
+    static const int radius_increase = 1;
     static const int max_radius = 128;
     static int radius;
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include "object.h"
 
 class Powerup : public Object
@@ -7,12 +8,13 @@ public:
     enum Type
     {
         none = -1,
-        biggerBall = 0,
-        fasterPaddle,
-        biggerPaddle,
-        spawnBalls,
+        scoreMultiplier = 0,
         life,
-        doublePointModifier
+        spawnBalls,
+        biggerPaddle,
+        fasterPaddle,
+        biggerBall,
+        COUNT
     };
 
 private:
@@ -39,4 +41,6 @@ public:
     void Update(float delta_time) override;
 
     Type GetType() { return type; };
+
+    static std::string GetDescription(Type type);
 };

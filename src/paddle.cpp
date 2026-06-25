@@ -35,12 +35,12 @@ void Paddle::Update(float delta_time)
     updateBallPosition();
     
     // Left - Right movement
-    if (keys[SDL_SCANCODE_A])
+    if (keys[SDL_SCANCODE_A] || keys[SDL_SCANCODE_LEFT])
     {
          rectangle.x -= speed * delta_time;
          paddle_direction = -1;
     }
-    else if (keys[SDL_SCANCODE_D]) 
+    else if (keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_RIGHT]) 
     {
         rectangle.x += speed * delta_time;
         paddle_direction = 1;

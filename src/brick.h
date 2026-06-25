@@ -28,4 +28,7 @@ public:
     void Destroy() override;
     void Reset();
     uint32_t GetPoints() { return points; };
+
+    static SDL_Color GetBrickColor(int row);
+    static int GetBrickPoints(int row);
 };

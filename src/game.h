@@ -41,7 +41,7 @@ private:
     const SDL_Point brick_count{.x = 8, .y = 6};
 
     void createBricks();
-    void addPowerupsToBricks();
+    void generatePowerups();
 
     // Game window
     const SDL_Color game_background_color { .r = 30, .g = 30, .b = 30, .a = 255};
@@ -69,6 +69,8 @@ public:
     void IncreaseScoreMultiplier() { player.score_multiplier += 1; };
     void IncreaseLives() { player.lives++; };
     void SpawnBalls(SDL_FPoint position);
+
+    // TODO: grid generation should be in its own class - the functionality is piling up in Game
 
     // TODO: rework to some unified event/message system
     void NotifyBallDestruction(Ball* ball);

@@ -13,11 +13,11 @@ void Scene::Update(float delta_time)
     {
         auto object = objects[i];
 
-        if(object == nullptr)
+        /*if(object == nullptr)
         {
             SDL_Log("Error: null pointer object: (%d)", i);
             continue;
-        }
+        }*/
 
         object->Update(delta_time);
     }
@@ -41,11 +41,11 @@ void Scene::Render(SDL_Renderer* renderer)
     {
         auto object = objects[i];
 
-        if(object == nullptr)
+        /*if(object == nullptr)
         {
             SDL_Log("Error: null pointer object: (%d)", i);
             continue;
-        }
+        }*/
 
         object->Render(renderer);
     }
@@ -81,11 +81,11 @@ void Scene::ResetAllBricks()
     {
         auto brick = bricks[i];
 
-        if(brick == nullptr)
+        /*if(brick == nullptr)
         {
             SDL_Log("RespawnAllBricks: null brick: %d !", i);
             continue;
-        }
+        }*/
 
         brick->Reset();
     }
@@ -101,11 +101,11 @@ int Scene::GetActiveBricksCount()
     {
         auto brick = bricks[i];
 
-        if(brick == nullptr)
+        /*if(brick == nullptr)
         {
             SDL_Log("RespawnAllBricks: null brick: %d !", i);
             continue;
-        }
+        }*/
 
         if(brick->IsActive())
         {
@@ -124,11 +124,11 @@ Brick* Scene::GetBrick(SDL_Point id)
     {
         Brick* brick = bricks[i];
 
-        if(brick == nullptr)
+        /*if(brick == nullptr)
         {
             SDL_Log("GetBrick: null brick: %d !", i);
             continue;
-        }
+        }*/
 
         if(brick->GetId().x == id.x and brick->GetId().y == id.y)
         {

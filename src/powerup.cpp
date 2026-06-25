@@ -9,8 +9,8 @@ Powerup::Powerup(SDL_Color& color_p, Type type_p)
     color = color_p;
     type = type_p;
     active = false;
-
-    speed = default_speed + int(type) * speed_increment;
+    
+    speed = default_speed + (int(Type::COUNT) - int(type)) * speed_increment;
 }
 
 Powerup::~Powerup()
@@ -78,6 +78,27 @@ void Powerup::Destroy()
     Game::GetInstance()->GetScene()->DestroyObject(this);
 }
 
+std::string Powerup::GetDescription(Type type)
+{
+    switch(type)
+    {
+        case Type::biggerBall:
+            return "Bigger Ball";
+        case Type::fasterPaddle:
+            return "Faster Paddle";
+        case Type::biggerPaddle:
+            return "Bigger Paddle";
+        case Type::spawnBalls:
+            return "Spawn Balls";
+        case Type::life:
+            return "Extra Life";
+        case Type::scoreMultiplier:
+            return "Score Multiplier";
+        default:
+            return "None";
+    }
+}
+
 void Powerup::triggerEffect()
 {
     switch(type)
@@ -97,7 +118,7 @@ void Powerup::triggerEffect()
         case Type::life:
             Game::GetInstance()->IncreaseLives();
             break;
-        case Type::doublePointModifier:
+        case Type::scoreMultiplier:
             Game::GetInstance()->IncreaseScoreMultiplier();
             break;
         default:
