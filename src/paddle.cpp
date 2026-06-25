@@ -128,7 +128,7 @@ void Paddle::IncreaseWidth()
     rectangle.x -= width_increase / 2.0f;
 
     // Limit to size of the viewport
-    rectangle.w = SDL_min(rectangle.w, game_viewport.x);
+    rectangle.w = SDL_min(rectangle.w, game_viewport.x / 2);
 
     x_max_pos = game_viewport.x - rectangle.w;
 }
