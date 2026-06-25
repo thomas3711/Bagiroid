@@ -3,13 +3,12 @@
 #include "game.h"
 #include "physics.h"
 
-Powerup::Powerup(SDL_Color& color_p, Type type_p)
+Powerup::Powerup(Type type_p)
 {
-    radius = default_radius;
-    color = color_p;
     type = type_p;
+    radius = default_radius;
     active = false;
-    
+    color = GetColor(type);
     speed = default_speed + (int(Type::COUNT) - int(type)) * speed_increment;
 }
 
@@ -99,6 +98,38 @@ std::string Powerup::GetDescription(Type type)
     }
 }
 
+SDL_Color Powerup::GetColor(Type type_p)
+{
+    SDL_Color color = { .r = 255, .g = 255, .b = 255, .a = 255 };
+
+    switch (type_p)
+    {
+    case Type::scoreMultiplier:
+        color = {255, 0, 0, 255};
+        break; // Red
+    case Type::life:
+        color = {255, 127, 0, 255};
+        break; // Orange
+    case Type::spawnBalls:
+        color = {255, 255, 0, 255};
+        break; // Yellow
+    case Type::biggerPaddle:
+        color = {0, 255, 0, 255};
+        break; // Green
+    case Type::fasterPaddle:
+        color = {0, 0, 255, 255};
+        break; // Blue
+    case Type::biggerBall:
+        color = {128, 0, 128, 255};
+        break; // Purple
+    default:
+        color = {255, 255, 255, 255};
+        break;
+    }
+
+    return color;
+}
+
 void Powerup::triggerEffect()
 {
     switch(type)
@@ -113,7 +144,7 @@ void Powerup::triggerEffect()
             Game::GetInstance()->GetScene()->GetPaddle().IncreaseWidth();
             break;
         case Type::spawnBalls:
-            Game::GetInstance()->SpawnBalls(position);
+            spawnBallsEffect(position);
             break;
         case Type::life:
             Game::GetInstance()->IncreaseLives();
@@ -123,5 +154,28 @@ void Powerup::triggerEffect()
             break;
         default:
             break;
+    }
+}
+
+void Powerup::spawnBallsEffect(SDL_FPoint position)
+{
+    const int ball_count = 3;
+    const float angle_step = (2.0f * SDL_PI_F) / ball_count;
+
+    float base_angle = SDL_randf() * 2.0f * SDL_PI_F;
+
+    for (int i = 0; i < ball_count; i++)
+    {
+        float angle = base_angle + i * angle_step;
+
+        Ball* ball = new Ball(false);
+
+        SDL_FPoint spawn_position = position;
+        ball->SetPosition(spawn_position);
+
+        SDL_FPoint direction;
+        direction.x = SDL_cosf(angle);
+        direction.y = SDL_sinf(angle);
+        ball->Launch(direction);
     }
 }

@@ -5,6 +5,7 @@
 #include "object.h"
 #include "paddle.h"
 #include "brick.h"
+#include "plugin_api.h"
 
 class Scene
 {
@@ -26,11 +27,10 @@ public:
     void AddObject(Object* object_to_add);
     void RemoveObject(Object* object_to_remove);
     void DestroyObject(Object* object_to_destroy);
+    void DeleteAll();
+    void AddBricks(GeneratedBrickskData* data);
     
-    void ResetAllBricks();
     int GetActiveBricksCount();
-    Brick* GetBrick(SDL_Point id);
-    std::vector<Brick*>& GetBricks();
 
     Paddle& GetPaddle() { return paddle; };
 

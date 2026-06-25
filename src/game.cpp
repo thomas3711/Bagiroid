@@ -32,8 +32,7 @@ void Game::Initialize()
 
     scene->GetPaddle().GiveBall();
 
-    level_generator->createBricks(scene, gameViewport);
-    level_generator->generatePowerups(scene);
+    generateLevel();
 
     running = true;
 }
@@ -92,16 +91,6 @@ void Game::NotifyBrickDestruction(Brick *brick)
 {
     player.score += player.level * player.score_multiplier * brick->GetPoints();
 
-    Powerup* powerup = brick->GetPowerup();
-
-    if(powerup != nullptr)
-    {
-        SDL_FRect brick_rect = brick->GetRectangle();
-        SDL_FPoint position { .x = brick_rect.x + brick_rect.w / 2.0f, .y = brick_rect.y + brick_rect.h / 2.0f };
-        powerup->Spawn(position);
-        brick->SetPowerup(nullptr);
-    }
-
     if(scene->GetActiveBricksCount() <= 0)
     {
         next_level_pending = true;
@@ -133,17 +122,16 @@ void Game::nextLevel()
     player.level++;
 
     scene->DeleteAllOfType<Ball>();
+    scene->DeleteAllOfType<Brick>();
     scene->GetPaddle().ClearHeldBall();
     scene->GetPaddle().GiveBall();
-    scene->ResetAllBricks();
-    level_generator->generatePowerups(scene);
+    generateLevel();
 }
 
 void Game::finalizePlayerDeath()
 {
     scene->GetPaddle().SetControlState(false);
-    scene->DeleteAllOfType<Ball>();
-    scene->DeleteAllOfType<Powerup>();
+    scene->DeleteAll();
     scene->GetPaddle().ClearHeldBall();
     running = false;
 }
@@ -158,31 +146,16 @@ void Game::restartGame()
     scene->GetPaddle().SetControlState(true);
     scene->GetPaddle().ClearHeldBall();
     scene->GetPaddle().GiveBall();
-    scene->ResetAllBricks();
-    level_generator->generatePowerups(scene);
+    generateLevel();
     Ball::ResetRadius();
     running = true;
 }
 
-void Game::SpawnBalls(SDL_FPoint position)
+void Game::generateLevel()
 {
-    const int ball_count = 3;
-    const float angle_step = (2.0f * SDL_PI_F) / ball_count;
+    level_generator->GenerateBricksData(gameViewport.w, gameViewport.h);
 
-    float base_angle = SDL_randf() * 2.0f * SDL_PI_F;
+    scene->AddBricks(level_generator->data);
 
-    for (int i = 0; i < ball_count; i++)
-    {
-        float angle = base_angle + i * angle_step;
-
-        Ball* ball = new Ball(false);
-
-        SDL_FPoint spawn_position = position;
-        ball->SetPosition(spawn_position);
-
-        SDL_FPoint direction;
-        direction.x = SDL_cosf(angle);
-        direction.y = SDL_sinf(angle);
-        ball->Launch(direction);
-    }
+    level_generator->FreeBricksData();
 }

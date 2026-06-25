@@ -45,6 +45,7 @@ private:
     void nextLevel();
     void finalizePlayerDeath();
     void restartGame();
+    void generateLevel();
 
 public:
     static Game* GetInstance();
@@ -58,9 +59,6 @@ public:
 
     void IncreaseScoreMultiplier() { player.score_multiplier += 1; };
     void IncreaseLives() { player.lives++; };
-    void SpawnBalls(SDL_FPoint position);
-
-    // TODO: grid generation should be in its own class - the functionality is piling up in Game
 
     // TODO: rework to some unified event/message system
     void NotifyBallDestruction(Ball* ball);

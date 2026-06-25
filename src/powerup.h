@@ -29,9 +29,10 @@ private:
     SDL_Color color;
 
     void triggerEffect();
+    void spawnBallsEffect(SDL_FPoint position);
 
 public:
-    Powerup(SDL_Color& color_p, Type type_p);
+    Powerup(Type type_p);
     ~Powerup() override;
 
     void Spawn(SDL_FPoint& position_p);
@@ -41,6 +42,7 @@ public:
     void Update(float delta_time) override;
 
     Type GetType() { return type; };
+    static SDL_Color GetColor(Type type_p);
 
     static std::string GetDescription(Type type);
 };

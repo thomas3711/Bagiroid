@@ -1,41 +1,22 @@
 #include "level_generator.h"
 
-void LevelGenerator::createBricks(Scene* scene, const SDL_Rect& viewport)
+void LevelGenerator::GenerateBricksData(const int& game_width, const int& game_height)
 {
+    int count = brick_count.x * brick_count.y;
+
+    data = new GeneratedBrickskData();
+    data->count = count;
+    data->bricks = new BrickData[count]();
+
     SDL_FPoint offset;
 
     float all_bricks_width = brick_count.x * brick_dimensions.x + (brick_count.x - 1) * brick_spacing.x;
 
-    offset.x = viewport.w / 2.0f - all_bricks_width / 2.0f;
+    offset.x = game_width / 2.0f - all_bricks_width / 2.0f;
     offset.y = 96;
 
-    for (int y = 0; y < brick_count.y; y++)
-    {
-        for (int x = 0; x < brick_count.x; x++)
-        {
-            SDL_FPoint position;
-            SDL_FPoint dimensions{.x = (float)brick_dimensions.x, .y = (float)brick_dimensions.y};
-            SDL_Color color;
-            uint32_t points = 0;
+    int index = 0;
 
-            position.x = x * (dimensions.x + brick_spacing.x) + offset.x;
-            position.y = y * (dimensions.y + brick_spacing.y) + offset.y;
-
-            color = Brick::GetBrickColor(y);
-            points = Brick::GetBrickPoints(y);
-
-            SDL_Point brick_id { .x = x, .y = y };
-            Brick *brick = new Brick(position, dimensions, color, points, brick_id);
-            
-            scene->AddObject(brick);
-        }
-    }
-
-    scene->ResetAllBricks();
-}
-
-void LevelGenerator::generatePowerups(Scene* scene)
-{
     for (int y = 0; y < brick_count.y; y++)
     {
         // For each row pick X distinct random columns that will hold a powerup.
@@ -58,17 +39,76 @@ void LevelGenerator::generatePowerups(Scene* scene)
 
         for (int x = 0; x < brick_count.x; x++)
         {
-            SDL_Point brick_id { .x = x, .y = y };
-            Brick* brick = scene->GetBrick(brick_id);
+            BrickData& brick_data = data->bricks[index];
 
-            // Add powerup if the brick has one
-            if(column_has_powerup[x])
-            {
-                Powerup* powerup = new Powerup(brick->GetColor(), (Powerup::Type)y);
-                //Powerup* powerup = new Powerup(brick->GetColor(), Powerup::Type::spawnBalls);
-                
-                brick->SetPowerup(powerup);
-            }
+            brick_data.w = brick_dimensions.x;
+            brick_data.h = brick_dimensions.y;
+
+            brick_data.x = x * (brick_data.w + brick_spacing.x) + offset.x;
+            brick_data.y = y * (brick_data.h + brick_spacing.y) + offset.y;
+
+            brick_data.points = LevelGenerator::GetBrickPoints(y);
+            SDL_Color color = LevelGenerator::GetBrickColor(y);
+            brick_data.r = color.r;
+            brick_data.g = color.g;
+            brick_data.b = color.b;
+
+            brick_data.powerup = column_has_powerup[x] ? y : -1;
+
+            index++;
         }
     }
+}
+
+void LevelGenerator::FreeBricksData()
+{
+    if(data == nullptr)
+    {
+        return;
+    }
+
+    delete[] data->bricks;
+    delete data;
+    data = nullptr;
+}
+
+
+
+SDL_Color LevelGenerator::GetBrickColor(int row)
+{
+    SDL_Color color = { .r = 255, .g = 255, .b = 255, .a = 255 };
+
+    switch (row)
+    {
+    case 0:
+        color = {255, 0, 0, 255};
+        break; // Red
+    case 1:
+        color = {255, 127, 0, 255};
+        break; // Orange
+    case 2:
+        color = {255, 255, 0, 255};
+        break; // Yellow
+    case 3:
+        color = {0, 255, 0, 255};
+        break; // Green
+    case 4:
+        color = {0, 0, 255, 255};
+        break; // Blue
+    case 5:
+        color = {128, 0, 128, 255};
+        break; // Purple
+    default:
+        color = {255, 255, 255, 255};
+        break;
+    }
+
+    return color;
+}
+
+int LevelGenerator::GetBrickPoints(int row)
+{
+    int exponent = 5 - row;
+    int points = SDL_pow(2, exponent);
+    return points;
 }

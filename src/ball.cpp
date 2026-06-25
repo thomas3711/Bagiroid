@@ -148,13 +148,10 @@ SDL_FPoint Ball::checkScreenEdgeCollision()
         return {-1.0f, 0.0f};     // right wall
     if (position.y - radius < 0) 
         return {0.0f, 1.0f};      // top wall
-    /*if (position.y + ball_radius > Game::GetInstance()->window_height)
-        return {0.0f, -1.0f};     // bottom wall*/
     
     return {0.0f, 0.0f};          // no collision
 }
 
-// Calculate rectangle collision normal
 SDL_FPoint Ball::getRectCollisionNormal(const SDL_FRect& rect)
 {
     // Find closest point on rectangle to circle center

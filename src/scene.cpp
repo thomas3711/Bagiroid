@@ -13,12 +13,6 @@ void Scene::Update(float delta_time)
     {
         auto object = objects[i];
 
-        /*if(object == nullptr)
-        {
-            SDL_Log("Error: null pointer object: (%d)", i);
-            continue;
-        }*/
-
         object->Update(delta_time);
     }
 
@@ -40,12 +34,6 @@ void Scene::Render(SDL_Renderer* renderer)
     for(int i = 0; i < objects.size(); i++)
     {
         auto object = objects[i];
-
-        /*if(object == nullptr)
-        {
-            SDL_Log("Error: null pointer object: (%d)", i);
-            continue;
-        }*/
 
         object->Render(renderer);
     }
@@ -73,21 +61,29 @@ void Scene::DestroyObject(Object* object_to_destroy)
     destroy_queue.push(object_to_destroy);
 }
 
-void Scene::ResetAllBricks()
+void Scene::DeleteAll()
 {
-    auto bricks = GetAllOfType<Brick>();
-
-    for(int i = 0; i < bricks.size(); i++)
+    for (Object* object : objects)
     {
-        auto brick = bricks[i];
+        delete object;
+    }
+    objects.clear();
 
-        /*if(brick == nullptr)
-        {
-            SDL_Log("RespawnAllBricks: null brick: %d !", i);
-            continue;
-        }*/
+    std::queue<Object*> empty;
+    std::swap(destroy_queue, empty);
+}
 
-        brick->Reset();
+void Scene::AddBricks(GeneratedBrickskData* data)
+{
+    for(int i = 0; i < data->count; i++)
+    {
+        BrickData& brick_data = data->bricks[i];
+        
+        SDL_FRect rectangle = { .x = brick_data.x, .y = brick_data.y, .w = brick_data.w, .h = brick_data.h };
+        SDL_Color color = { .r = (uint8_t)brick_data.r, .g = (uint8_t)brick_data.g, .b = (uint8_t)brick_data.b, .a = 255 };
+
+        Brick* brick = new Brick(rectangle, color, brick_data.points, (Powerup::Type)brick_data.powerup);
+        AddObject(brick);
     }
 }
 
@@ -95,46 +91,17 @@ int Scene::GetActiveBricksCount()
 {
     auto bricks = GetAllOfType<Brick>();
 
-    int total_alive_bricks = 0;
+    int total_active_bricks = 0;
 
     for(int i = 0; i < bricks.size(); i++)
     {
         auto brick = bricks[i];
 
-        /*if(brick == nullptr)
-        {
-            SDL_Log("RespawnAllBricks: null brick: %d !", i);
-            continue;
-        }*/
-
         if(brick->IsActive())
         {
-            total_alive_bricks++;
+            total_active_bricks++;
         }
     }
 
-    return total_alive_bricks;
-}
-
-Brick* Scene::GetBrick(SDL_Point id)
-{
-    auto bricks = GetAllOfType<Brick>();
-
-    for(int i = 0; i < bricks.size(); i++)
-    {
-        Brick* brick = bricks[i];
-
-        /*if(brick == nullptr)
-        {
-            SDL_Log("GetBrick: null brick: %d !", i);
-            continue;
-        }*/
-
-        if(brick->GetId().x == id.x and brick->GetId().y == id.y)
-        {
-            return brick;
-        }
-    }
-
-    return nullptr;
+    return total_active_bricks;
 }

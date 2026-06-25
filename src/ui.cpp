@@ -87,9 +87,10 @@ void UI::RenderInfoPanelUI(SDL_Renderer* renderer, const SDL_Rect& viewport, con
         for (int i = 0; i < static_cast<int>(Powerup::Type::COUNT); i++)
         {
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-            std::string description = "- " + Powerup::GetDescription((Powerup::Type)i);
+            Powerup::Type powerup_type = (Powerup::Type)i;
+            std::string description = "- " + Powerup::GetDescription(powerup_type);
             SDL_RenderDebugTextFormat(renderer, ui_position.x + hint_circle_radius * 2, ui_position.y, description.c_str());
-            SDL_Color color = Brick::GetBrickColor(i);
+            SDL_Color color = Powerup::GetColor(powerup_type);
             SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
             Draw::drawFilledCircle(renderer, ui_position.x, ui_position.y + hint_circle_radius / 2, hint_circle_radius);
             ui_position.y += hint_row_spacing;
