@@ -3,11 +3,13 @@
 #include "object.h"
 #include "powerup.h"
 
+// Bricks object that can be destroyed with a ball
 class Brick : public Object
 {
+private:
     SDL_FRect rectangle;
     SDL_Color color;
-    uint32_t points = 0;
+    uint32_t points;
     SDL_Point id;
     Powerup::Type powerup_type;
 public:

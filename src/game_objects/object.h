@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL3/SDL.h>
 
+// Parent class for all game objects
 class Object
 {
 protected:

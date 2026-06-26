@@ -2,16 +2,19 @@
 #include <SDL3/SDL.h>
 #include "ball.h"
 
-class Paddle 
+// Player controlled paddle at the bottom of the screen.
+// Handles input, control, update and render of the paddle
+class Paddle
 {
     const int default_width = 150;
     const int height = 10;
-    const float width_increase = 25;
-    float speed = 750.0f;
+    const float width_increase = 25;    
     const float default_speed = 750.0f;
     const float speed_increase = 50.0f;
     const float max_speed = 1600.0f;
     const int color = 192;
+
+    float speed = 750.0f;
 
     int x_min_pos;
     int x_max_pos;

@@ -2,17 +2,10 @@
 #include "scene.h"
 #include "ui.h"
 #include "level_generator.h"
+#include "player.h"
 
-#define PLAYER_START_LIVES 3;
-
-struct Player
-{
-    int lives = PLAYER_START_LIVES;
-    uint64_t score = 0;
-    uint16_t level = 1;
-    uint64_t score_multiplier = 1;
-};
-
+// Master class that handles initialization, game state flow and 
+// everything that does not yet has its own place
 class Game
 {
 private:
@@ -28,6 +21,8 @@ private:
 
     bool next_level_pending = false;
     bool player_died_pending = false;
+
+    bool plugins_loaded = false;
 
     // --- Singleton
     // Private constructor to prevent instantiation
@@ -53,7 +48,7 @@ public:
 
     ~Game();
 
-    void Initialize();
+    void Initialize(bool load_plugins = false);
     void Update(float delta_time);
     void Render(SDL_Renderer* renderer);
 

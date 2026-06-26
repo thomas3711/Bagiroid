@@ -1,15 +1,18 @@
 #pragma once
 #include "object.h"
 
+// Ball that player launches from paddle, as well as balls spawned from power up
+// Handles movement, rendering and collision
 class Ball : public Object
 {
+    static constexpr int default_radius = 8;
+    static constexpr int radius_increase = 1;
+    static constexpr int max_radius = 128;
+
+    static int radius;
+
     float speed = 1000.0f;
     bool reduce_lives_after_death = true;
-    // All balls will have the same radius allways
-    static const int default_radius = 8;
-    static const int radius_increase = 1;
-    static const int max_radius = 128;
-    static int radius;
 
     SDL_FPoint position { 0.0f, 0.0f };
     SDL_FPoint velocity { 0.0f, 0.0f };

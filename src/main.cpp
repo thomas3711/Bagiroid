@@ -1,12 +1,7 @@
 #include <SDL3/SDL.h>
 #include "game.h"
-#include "paddle.h"
-#include "ball.h"
 
 #define APPLICATION_NAME "Bagiroid"
-
-void initialize_brick_field();
-void draw_bricks();
 
 SDL_Renderer* renderer;
 SDL_Window* window;
@@ -15,10 +10,20 @@ int main(int argc, char* argv[])
 {
     SDL_Init(SDL_INIT_VIDEO);
 
+    // Enable plugin loading only when started with -p (or --plugins).
+    bool load_plugins = false;
+    for (int i = 1; i < argc; i++)
+    {
+        if (SDL_strcmp(argv[i], "-p") == 0 || SDL_strcmp(argv[i], "--plugins") == 0)
+        {
+            load_plugins = true;
+        }
+    }
+
     window = SDL_CreateWindow(APPLICATION_NAME, Game::GetInstance()->window_width, Game::GetInstance()->window_height, 0);
     renderer = SDL_CreateRenderer(window, nullptr);
 
-    Game::GetInstance()->Initialize();
+    Game::GetInstance()->Initialize(load_plugins);
 
     bool running = true;
     SDL_Event event;
@@ -34,7 +39,8 @@ int main(int argc, char* argv[])
 
         // TODO: Encapsulate
         // Check application quit
-        while (SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event))
+        {
             if (event.type == SDL_EVENT_QUIT) running = false;
         }
 

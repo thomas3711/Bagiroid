@@ -31,6 +31,7 @@ void Scene::Update(float delta_time)
 
 void Scene::Render(SDL_Renderer* renderer)
 {
+    // Render all objects
     for(int i = 0; i < objects.size(); i++)
     {
         auto object = objects[i];
@@ -82,7 +83,8 @@ void Scene::AddBricks(GeneratedBrickskData* data)
         SDL_FRect rectangle = { .x = brick_data.x, .y = brick_data.y, .w = brick_data.w, .h = brick_data.h };
         SDL_Color color = { .r = (uint8_t)brick_data.r, .g = (uint8_t)brick_data.g, .b = (uint8_t)brick_data.b, .a = 255 };
 
-        Brick* brick = new Brick(rectangle, color, brick_data.points, (Powerup::Type)brick_data.powerup);
+        Powerup::Type powerup = (Powerup::Type)SDL_clamp(brick_data.powerup, Powerup::Type::none, Powerup::Type::COUNT - 1);
+        Brick* brick = new Brick(rectangle, color, brick_data.points, powerup);
         AddObject(brick);
     }
 }

@@ -24,11 +24,16 @@ Game *Game::GetInstance()
     return instance;
 }
 
-void Game::Initialize()
+void Game::Initialize(bool load_plugins)
 {
     scene = new Scene();
     ui = new UI();
     level_generator = new LevelGenerator();
+
+    if (load_plugins)
+    {
+        plugins_loaded = level_generator->LoadPlugin();
+    }
 
     scene->GetPaddle().GiveBall();
 
@@ -80,7 +85,7 @@ void Game::Render(SDL_Renderer *renderer)
         ui->RenderRestartGameUI(renderer, gameViewport);
     }
 
-    ui->RenderInfoPanelUI(renderer, infoViewport, player, running);
+    ui->RenderInfoPanelUI(renderer, infoViewport, player, running, plugins_loaded);
 
     SDL_SetRenderScale(renderer, 1.0f, 1.0f);
     SDL_SetRenderViewport(renderer, NULL);
@@ -89,7 +94,7 @@ void Game::Render(SDL_Renderer *renderer)
 
 void Game::NotifyBrickDestruction(Brick *brick)
 {
-    player.score += player.level * player.score_multiplier * brick->GetPoints();
+    player.score += player.score_multiplier * brick->GetPoints();
 
     if(scene->GetActiveBricksCount() <= 0)
     {
@@ -120,6 +125,7 @@ void Game::NotifyBallDestruction(Ball *ball)
 void Game::nextLevel()
 {
     player.level++;
+    player.score_multiplier++;
 
     scene->DeleteAllOfType<Ball>();
     scene->DeleteAllOfType<Brick>();

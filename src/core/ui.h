@@ -3,6 +3,7 @@
 
 struct Player;
 
+// Renders UI
 class UI
 {
 private:
@@ -10,5 +11,5 @@ private:
 
 public:
     void RenderRestartGameUI(SDL_Renderer* renderer, const SDL_Rect& viewport, float scale = 2.0f);
-    void RenderInfoPanelUI(SDL_Renderer* renderer, const SDL_Rect& viewport, const Player& player, bool game_running);
+    void RenderInfoPanelUI(SDL_Renderer* renderer, const SDL_Rect& viewport, const Player& player, bool game_running, bool plugins_loaded);
 };

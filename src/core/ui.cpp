@@ -36,7 +36,7 @@ void UI::RenderRestartGameUI(SDL_Renderer* renderer, const SDL_Rect& viewport, f
     SDL_SetRenderScale(renderer, 1.0f, 1.0f);
 }
 
-void UI::RenderInfoPanelUI(SDL_Renderer* renderer, const SDL_Rect& viewport, const Player& player, bool game_running)
+void UI::RenderInfoPanelUI(SDL_Renderer* renderer, const SDL_Rect& viewport, const Player& player, bool game_running, bool plugins_loaded)
 {
     SDL_SetRenderScale(renderer, 1.0f, 1.0f);
     SDL_SetRenderViewport(renderer, &viewport);
@@ -73,6 +73,13 @@ void UI::RenderInfoPanelUI(SDL_Renderer* renderer, const SDL_Rect& viewport, con
         SDL_RenderDebugTextFormat(renderer, ui_position.x, ui_position.y, "Lives: %d", player.lives);
         ui_position.y += row_spacing;
         SDL_RenderDebugTextFormat(renderer, ui_position.x, ui_position.y, "Score Multiplier: %dx", player.score_multiplier);
+
+        // Plugins state
+        if(plugins_loaded)
+        {
+            ui_position.y += 8 * row_spacing;
+            SDL_RenderDebugTextFormat(renderer, ui_position.x, ui_position.y, "Plugins loaded.");
+        }
 
         // Help
         float hint_row_spacing = 24.0f;

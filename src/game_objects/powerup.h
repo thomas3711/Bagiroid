@@ -2,6 +2,8 @@
 #include <string>
 #include "object.h"
 
+// Powerup that spawns as a reward from some bricks.
+// It applies the effect to the game in triggerEffect();
 class Powerup : public Object
 {
 public:

@@ -7,6 +7,7 @@
 #include "brick.h"
 #include "plugin_api.h"
 
+// Container and management class for all game objects.
 class Scene
 {
 private:

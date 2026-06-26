@@ -1,6 +1,34 @@
 #include "level_generator.h"
 
+bool LevelGenerator::LoadPlugin(const std::string& directory)
+{
+    const char* base_path = SDL_GetBasePath();
+    std::string resolved = base_path ? std::string(base_path) + directory : directory;
+
+    return plugin.LoadFromDirectory(resolved);
+}
+
 void LevelGenerator::GenerateBricksData(const int& game_width, const int& game_height)
+{
+    if (plugin.IsLoaded())
+    {
+        BrickGenContext context{ .game_width = game_width, .game_height = game_height };
+        data = plugin.Generate(context);
+
+        if (data != nullptr and data->count >= 0 and (data->count == 0 || data->bricks != nullptr))
+        {
+            data_from_plugin = true;
+            return;
+        }
+
+        SDL_Log("Plugin '%s' returned no data, falling back to built-in generator", plugin.Path().c_str());
+    }
+
+    data_from_plugin = false;
+    GenerateBricksDataBuiltin(game_width, game_height);
+}
+
+void LevelGenerator::GenerateBricksDataBuiltin(const int& game_width, const int& game_height)
 {
     int count = brick_count.x * brick_count.y;
 
@@ -67,9 +95,18 @@ void LevelGenerator::FreeBricksData()
         return;
     }
 
-    delete[] data->bricks;
-    delete data;
+    if(data_from_plugin)
+    {
+        plugin.Free(data);
+    }
+    else
+    {
+        delete[] data->bricks;
+        delete data;
+    }
+
     data = nullptr;
+    data_from_plugin = false;
 }
 
 
