@@ -1,3 +1,6 @@
+## Requirements
+- Game uses SDL3
+
 ## Game controls
 - A/left arrow - move paddle to the left
 - D/right arrow - move paddle to the right
@@ -8,7 +11,7 @@
 ## Plugins/Mods
 - Launch the game with parameter -p or --plugins to load mods for level generation
 - Game searches for libraries in /plugins subfolder from where the executable is
-- There is an example plugin with different brick setting in plugins/example/example_plugin.cpp
+- There is an example plugin with different brick layout in plugins/example/example_plugin.cpp
 - Plugin level generation is not very safe, game can definitely be broken by them
 
 ## Potential Improvements
