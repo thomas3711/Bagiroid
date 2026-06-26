@@ -56,19 +56,28 @@ PLUGIN_EXPORT GeneratedBrickskData* plugin_generate_bricks(const BrickGenContext
 
             brick.points = 1000;
 
-            if(std::rand() % 3 == 0)
+            auto roll = std::rand() % 3;
+
+            if(roll == 0)
             {
                 brick.r = 255;
                 brick.g = 255;
                 brick.b = 0;
                 brick.powerup = 2;
             }
-            else
+            else if (roll == 1)
             {
                 brick.r = 0;
                 brick.g = 0;
                 brick.b = 255;
                 brick.powerup = 4;
+            }
+            else
+            {
+                brick.r = 0;
+                brick.g = 255;
+                brick.b = 0;
+                brick.powerup = 3;
             }
 
             index++;

@@ -7,6 +7,8 @@
 #include "brick.h"
 #include "plugin_api.h"
 
+#define MAX_BRICKS 512
+
 // Container and management class for all game objects.
 class Scene
 {

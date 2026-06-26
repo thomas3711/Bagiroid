@@ -111,3 +111,10 @@ void UI::RenderInfoPanelUI(SDL_Renderer* renderer, const SDL_Rect& viewport, con
     SDL_SetRenderScale(renderer, 1.0f, 1.0f);
     SDL_SetRenderViewport(renderer, &viewport);
 }
+
+void UI::RenderGameBackground(SDL_Renderer* renderer, const SDL_Rect& viewport)
+{
+    SDL_SetRenderDrawColor(renderer, game_background_color.r, game_background_color.g, game_background_color.b, game_background_color.a);
+    SDL_FRect hud_background = {0.0f, 0.0f, (float)viewport.w, (float)viewport.h};
+    SDL_RenderFillRect(renderer, &hud_background);
+}

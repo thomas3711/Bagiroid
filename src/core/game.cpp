@@ -24,31 +24,73 @@ Game *Game::GetInstance()
     return instance;
 }
 
-void Game::Initialize(bool load_plugins)
+void Game::Initialize(int argc, char* argv[])
 {
+    // Initialize main objects
+    window = SDL_CreateWindow(APPLICATION_NAME, window_width, window_height, SDL_WINDOW_FULLSCREEN);
+    renderer = SDL_CreateRenderer(window, nullptr);
+    SDL_SetRenderLogicalPresentation(renderer, window_width, window_height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+
     scene = new Scene();
     ui = new UI();
     level_generator = new LevelGenerator();
+
+    // Check program arguments and load plugins if necessary
+    bool load_plugins = false;
+    for (int i = 1; i < argc; i++)
+    {
+        if (SDL_strcmp(argv[i], "-p") == 0 || SDL_strcmp(argv[i], "--plugins") == 0)
+        {
+            load_plugins = true;
+        }
+    }
 
     if (load_plugins)
     {
         plugins_loaded = level_generator->LoadPlugin();
     }
 
+    // Setup the game stage
     scene->GetPaddle().GiveBall();
-
     generateLevel();
+    
+    // Start delta time calculation
+    last_frame_time = SDL_GetTicks();
 
-    running = true;
+    // State
+    application_running = true;
+    game_running = true;
 }
 
-void Game::Update(float delta_time)
+void Game::Quit()
 {
-    if(running)
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+}
+
+void Game::Update()
+{
+    const bool *keys = SDL_GetKeyboardState(nullptr);
+
+    // Calculate delta time in seconds
+    Uint64 current_frame_time = SDL_GetTicks();
+    float delta_time = (current_frame_time - last_frame_time) / 1000.0f;
+    last_frame_time = current_frame_time;
+
+    // Check application quit
+    while ((SDL_PollEvent(&event) and event.type == SDL_EVENT_QUIT) or keys[SDL_SCANCODE_ESCAPE])
+    {
+        application_running = false;
+    }
+
+    // Update scene
+    if(game_running)
     {
         scene->Update(delta_time);
     }
 
+    // Check state changes
     if(player_died_pending)
     {
         finalizePlayerDeath();
@@ -61,32 +103,37 @@ void Game::Update(float delta_time)
         next_level_pending = false;
     }
 
-    const bool *keys = SDL_GetKeyboardState(nullptr);
-
-    // R - to reset game, when player is dead
-    if (!running and keys[SDL_SCANCODE_R])
+    // Check R press to reset game, when player is dead
+    if (!game_running and keys[SDL_SCANCODE_R])
     {
         restartGame();
     }
 }
-void Game::Render(SDL_Renderer *renderer)
+
+void Game::Render()
 {
+    // Clear
     SDL_SetRenderViewport(renderer, NULL);
-    SDL_SetRenderDrawColor(renderer, game_background_color.r, game_background_color.g, game_background_color.b, game_background_color.a);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    if(running)
+    // Game viewport render
+    SDL_SetRenderViewport(renderer, &game_viewport);
+    ui->RenderGameBackground(renderer, game_viewport);
+
+    if(game_running)
     {
-        SDL_SetRenderViewport(renderer, &gameViewport);
         scene->Render(renderer);
     }
     else
     {
-        ui->RenderRestartGameUI(renderer, gameViewport);
+        ui->RenderRestartGameUI(renderer, game_viewport);
     }
 
-    ui->RenderInfoPanelUI(renderer, infoViewport, player, running, plugins_loaded);
+    // Info panel render
+    ui->RenderInfoPanelUI(renderer, infoViewport, player, game_running, plugins_loaded);
 
+    // Reset and present
     SDL_SetRenderScale(renderer, 1.0f, 1.0f);
     SDL_SetRenderViewport(renderer, NULL);
     SDL_RenderPresent(renderer);
@@ -139,7 +186,7 @@ void Game::finalizePlayerDeath()
     scene->GetPaddle().SetControlState(false);
     scene->DeleteAll();
     scene->GetPaddle().ClearHeldBall();
-    running = false;
+    game_running = false;
 }
 
 void Game::restartGame()
@@ -154,12 +201,12 @@ void Game::restartGame()
     scene->GetPaddle().GiveBall();
     generateLevel();
     Ball::ResetRadius();
-    running = true;
+    game_running = true;
 }
 
 void Game::generateLevel()
 {
-    level_generator->GenerateBricksData(gameViewport.w, gameViewport.h);
+    level_generator->GenerateBricksData(game_viewport.w, game_viewport.h);
 
     scene->AddBricks(level_generator->data);
 

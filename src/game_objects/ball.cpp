@@ -76,8 +76,8 @@ void Ball::Update(float delta_time)
     SDL_FPoint normal = checkScreenEdgeCollision();
     if (normal.x != 0.0f || normal.y != 0.0f) {
         // Clamp ball to stay in bounds
-        position.x = SDL_clamp(position.x, radius, Game::GetInstance()->gameViewport.w - radius);
-        position.y = SDL_clamp(position.y, radius, Game::GetInstance()->gameViewport.h - radius);
+        position.x = SDL_clamp(position.x, radius, Game::GetInstance()->game_viewport.w - radius);
+        position.y = SDL_clamp(position.y, radius, Game::GetInstance()->game_viewport.h - radius);
         
         // Calculate and set bounce velocity
         bounce(normal);
@@ -144,7 +144,7 @@ SDL_FPoint Ball::checkScreenEdgeCollision()
 {
     if (position.x - radius < 0) 
         return {1.0f, 0.0f};      // left wall
-    if (position.x + radius > Game::GetInstance()->gameViewport.w) 
+    if (position.x + radius > Game::GetInstance()->game_viewport.w) 
         return {-1.0f, 0.0f};     // right wall
     if (position.y - radius < 0) 
         return {0.0f, 1.0f};      // top wall

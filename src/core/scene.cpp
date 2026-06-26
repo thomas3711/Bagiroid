@@ -78,6 +78,11 @@ void Scene::AddBricks(GeneratedBrickskData* data)
 {
     for(int i = 0; i < data->count; i++)
     {
+        if(i == MAX_BRICKS)
+        {
+            return;
+        }
+
         BrickData& brick_data = data->bricks[i];
         
         SDL_FRect rectangle = { .x = brick_data.x, .y = brick_data.y, .w = brick_data.w, .h = brick_data.h };

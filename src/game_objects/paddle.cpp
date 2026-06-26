@@ -6,8 +6,8 @@ Paddle::Paddle()
     rectangle.w = default_width;
     rectangle.h = height;
 
-    game_viewport.x = Game::GetInstance()->gameViewport.w;
-    game_viewport.y = Game::GetInstance()->gameViewport.h;
+    game_viewport.x = Game::GetInstance()->game_viewport.w;
+    game_viewport.y = Game::GetInstance()->game_viewport.h;
 
     x_min_pos = 0;
     x_max_pos = game_viewport.x - rectangle.w;
@@ -125,10 +125,17 @@ void Paddle::ResetToDefault()
 void Paddle::IncreaseWidth()
 {
     rectangle.w += width_increase;
-    rectangle.x -= width_increase / 2.0f;
 
     // Limit to size of the viewport
-    rectangle.w = SDL_min(rectangle.w, game_viewport.x / 2);
+    auto limit = game_viewport.x / 2;
+    if(rectangle.w > limit)
+    {
+        rectangle.w = limit;
+    }
+    else
+    {
+        rectangle.x -= width_increase / 2.0f;
+    }
 
     x_max_pos = game_viewport.x - rectangle.w;
 }

@@ -4,37 +4,39 @@
 #include "level_generator.h"
 #include "player.h"
 
+#define APPLICATION_NAME "Bagiroid"
+
 // Master class that handles initialization, game state flow and 
 // everything that does not yet has its own place
 class Game
 {
 private:
-    static Game* instance;
+    // --- Singleton    
+    static Game* instance;    
+    Game();
+    Game(const Game&) = delete;
+    Game& operator=(const Game&) = delete;
+    // ---
     
+    SDL_Renderer* renderer;
+    SDL_Window* window;
     Scene* scene;
     UI* ui;
     LevelGenerator *level_generator;
 
     Player player;
 
-    bool running = false;
+    bool game_running = false;
+    bool application_running = false;
 
     bool next_level_pending = false;
     bool player_died_pending = false;
 
     bool plugins_loaded = false;
 
-    // --- Singleton
-    // Private constructor to prevent instantiation
-    Game();
-    
-    // Delete copy constructor and assignment operator
-    Game(const Game&) = delete;
-    Game& operator=(const Game&) = delete;
-    // ---
+    Uint64 last_frame_time;
 
-    // Game window
-    const SDL_Color game_background_color { .r = 30, .g = 30, .b = 30, .a = 255};
+    SDL_Event event;
 
     // Game
     void nextLevel();
@@ -48,22 +50,23 @@ public:
 
     ~Game();
 
-    void Initialize(bool load_plugins = false);
-    void Update(float delta_time);
-    void Render(SDL_Renderer* renderer);
+    void Initialize(int argc, char* argv[]);
+    void Quit();
+    void Update();
+    void Render();
 
     void IncreaseScoreMultiplier() { player.score_multiplier += 1; };
     void IncreaseLives() { player.lives++; };
 
-    // TODO: rework to some unified event/message system
+    bool IsApplicationRunning() { return application_running; };
+
     void NotifyBallDestruction(Ball* ball);
     void NotifyBrickDestruction(Brick* brick);
 
-    // TODO: maybe move to some window class, or some global static settings
-    const SDL_Rect gameViewport = {0, 0, 1520, 1080};
-    const SDL_Rect infoViewport  = {gameViewport.w, 0, 400, 1080};
+    const SDL_Rect game_viewport = {0, 0, 1520, 1080};
+    const SDL_Rect infoViewport  = {game_viewport.w, 0, 400, 1080};
 
-    const int window_width = gameViewport.w + infoViewport.w;
+    const int window_width = game_viewport.w + infoViewport.w;
     const int window_height = 1080;
 
     

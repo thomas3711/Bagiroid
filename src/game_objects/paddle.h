@@ -11,7 +11,7 @@ class Paddle
     const float width_increase = 25;    
     const float default_speed = 750.0f;
     const float speed_increase = 50.0f;
-    const float max_speed = 1600.0f;
+    const float max_speed = 2000.0f;
     const int color = 192;
 
     float speed = 750.0f;
