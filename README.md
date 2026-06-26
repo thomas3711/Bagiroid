@@ -1,22 +1,24 @@
-Game controlls:
-A/left arrow - move paddle to the left
-D/right arrow - move paddle to the right
-Space - launch ball (if there is one on the paddle)
-R - restart game after player death
-Esc - quit game
+## Game controls
+- A/left arrow - move paddle to the left
+- D/right arrow - move paddle to the right
+- Space - launch ball (if there is one on the paddle)
+- R - restart game after player death
+- Esc - quit game
 
-Plugins/Mods:
+## Plugins/Mods
 - Launch the game with parameter -p or --plugins to load mods for level generation
 - Game searches for libraries in /plugins subfolder from where the executable is
 - There is an example plugin with different brick setting in plugins/example/example_plugin.cpp
 - Plugin level generation is not very safe, game can definitely be broken by them
 
-Potential Improvements:
+## Potential Improvements
 - Smooth/Antialiased ball drawing
 - Faster collision checks (every ball checks all the bricks) - quadtree
 - Expose other settings (player, paddle, ball) to plugins
 
-Architecture:
+## Architecture
+
+```
 src/
   main.cpp                        - entry point: initializes game and runs main loop
 
@@ -44,6 +46,7 @@ src/
 
 plugins/
   example/example_plugin.cpp      - example level-generation plugin built as a standalone shared library
+```
 
-TODO:
-Test on windows
+## TODO
+- Test on windows
