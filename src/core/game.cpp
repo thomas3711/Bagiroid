@@ -79,7 +79,7 @@ void Game::Update()
     last_frame_time = current_frame_time;
 
     // Check application quit
-    while ((SDL_PollEvent(&event) and event.type == SDL_EVENT_QUIT) or keys[SDL_SCANCODE_ESCAPE])
+    while ((SDL_PollEvent(&event) && event.type == SDL_EVENT_QUIT) || keys[SDL_SCANCODE_ESCAPE])
     {
         application_running = false;
     }
@@ -104,7 +104,7 @@ void Game::Update()
     }
 
     // Check R press to reset game, when player is dead
-    if (!game_running and keys[SDL_SCANCODE_R])
+    if (!game_running && keys[SDL_SCANCODE_R])
     {
         restartGame();
     }

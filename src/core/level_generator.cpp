@@ -15,7 +15,7 @@ void LevelGenerator::GenerateBricksData(const int& game_width, const int& game_h
         BrickGenContext context{ .game_width = game_width, .game_height = game_height };
         data = plugin.Generate(context);
 
-        if (data != nullptr and data->count >= 0 and (data->count == 0 || data->bricks != nullptr))
+        if (data != nullptr && data->count >= 0 && (data->count == 0 || data->bricks != nullptr))
         {
             data_from_plugin = true;
             return;

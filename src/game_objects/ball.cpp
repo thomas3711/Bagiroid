@@ -114,7 +114,7 @@ void Ball::Update(float delta_time)
         auto brick = bricks[i];
         auto rectangle = brick->GetRectangle();
 
-        if(brick->IsActive() and Physics::isSphereCollidingWithRect(position, radius, rectangle))
+        if(brick->IsActive() && Physics::isSphereCollidingWithRect(position, radius, rectangle))
         {
             // TODO: encapsulate to collider with rectangle (or something so it is not copied in paddle check)
             SDL_FPoint normal = getRectCollisionNormal(rectangle);

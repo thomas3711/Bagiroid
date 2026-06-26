@@ -85,7 +85,7 @@ void UI::RenderInfoPanelUI(SDL_Renderer* renderer, const SDL_Rect& viewport, con
         float hint_row_spacing = 24.0f;
         int hint_circle_radius = 8;
         ui_position.x += hint_circle_radius;
-        ui_position.y = scaledViewport.h - 26.0f - hint_row_spacing * Powerup::Type::COUNT;
+        ui_position.y = scaledViewport.h - 26.0f - hint_row_spacing * (int)Powerup::Type::COUNT;
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderDebugTextFormat(renderer, ui_position.x + hint_circle_radius * 2, ui_position.y, "Powerups: ");

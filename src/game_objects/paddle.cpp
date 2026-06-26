@@ -66,7 +66,7 @@ void Paddle::Update(float delta_time)
     space_was_down = space_down;
 
     // Shooting ball
-    if (ball != nullptr and space_key_just_pressed)
+    if (ball != nullptr && space_key_just_pressed)
     {
         SDL_FPoint ball_direction;
         ball_direction.x = paddle_direction;
