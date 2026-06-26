@@ -1,5 +1,27 @@
+# Bagiroid
+
+Arkanoid clone project for hiring homework
+
 ## Requirements
-- Game uses SDL3
+- A C++20 compiler
+- [SDL3](https://github.com/libsdl-org/SDL) (development libraries)
+- CMake 3.16+
+
+## Building
+Bagiroid uses CMake. SDL3 must be installed and discoverable by CMake (e.g. via your distro package manager or built from source).
+
+```sh
+cmake -B build
+cmake --build build
+```
+
+This produces the `bagiroid` executable in `build/`, and builds the example plugin into `build/plugins/`.
+
+## Running
+```sh
+./build/bagiroid            # run the game
+./build/bagiroid --plugins  # run with level-generation plugins loaded (see Plugins/Mods)
+```
 
 ## Game controls
 - A/left arrow - move paddle to the left
@@ -50,6 +72,3 @@ src/
 plugins/
   example/example_plugin.cpp      - example level-generation plugin built as a standalone shared library
 ```
-
-## TODO
-- Test on windows
