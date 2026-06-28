@@ -4,24 +4,14 @@
 #include <vector>
 #include <string>
 
-Game *Game::instance = nullptr;
-
-Game::Game()
-{
-}
-
 Game::~Game()
 {
 }
 
 Game *Game::GetInstance()
 {
-    if (instance == nullptr)
-    {
-        instance = new Game();
-    }
-
-    return instance;
+    static Game instance;
+    return &instance;
 }
 
 void Game::Initialize(int argc, char* argv[])
@@ -31,9 +21,12 @@ void Game::Initialize(int argc, char* argv[])
     renderer = SDL_CreateRenderer(window, nullptr);
     SDL_SetRenderLogicalPresentation(renderer, window_width, window_height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-    scene = new Scene();
-    ui = new UI();
-    level_generator = new LevelGenerator();
+    // Enable vsync so the main loop doesn't busy-wait and peg a CPU core.
+    SDL_SetRenderVSync(renderer, 1);
+
+    scene = std::make_unique<Scene>();
+    ui = std::make_unique<UI>();
+    level_generator = std::make_unique<LevelGenerator>();
 
     // Check program arguments and load plugins if necessary
     bool load_plugins = false;
@@ -78,8 +71,16 @@ void Game::Update()
     float delta_time = (current_frame_time - last_frame_time) / 1000.0f;
     last_frame_time = current_frame_time;
 
-    // Check application quit
-    while ((SDL_PollEvent(&event) && event.type == SDL_EVENT_QUIT) || keys[SDL_SCANCODE_ESCAPE])
+    // Drain the event queue, then check quit conditions separately
+    while (SDL_PollEvent(&event))
+    {
+        if (event.type == SDL_EVENT_QUIT)
+        {
+            application_running = false;
+        }
+    }
+
+    if (keys[SDL_SCANCODE_ESCAPE])
     {
         application_running = false;
     }
@@ -131,7 +132,7 @@ void Game::Render()
     }
 
     // Info panel render
-    ui->RenderInfoPanelUI(renderer, infoViewport, player, game_running, plugins_loaded);
+    ui->RenderInfoPanelUI(renderer, info_viewport, player, game_running, plugins_loaded);
 
     // Reset and present
     SDL_SetRenderScale(renderer, 1.0f, 1.0f);
@@ -208,7 +209,7 @@ void Game::generateLevel()
 {
     level_generator->GenerateBricksData(game_viewport.w, game_viewport.h);
 
-    scene->AddBricks(level_generator->data);
+    scene->AddBricks(level_generator->GetData());
 
     level_generator->FreeBricksData();
 }

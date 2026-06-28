@@ -20,11 +20,11 @@ PLUGIN_EXPORT int plugin_api_version(void)
     return PLUGIN_VERSION;
 }
 
-PLUGIN_EXPORT GeneratedBrickskData* plugin_generate_bricks(const BrickGenContext* ctx)
+PLUGIN_EXPORT GeneratedBricksData* plugin_generate_bricks(const BrickGenContext* ctx)
 {
     const int count = columns * rows;
 
-    auto* result = static_cast<GeneratedBrickskData*>(std::malloc(sizeof(GeneratedBrickskData)));
+    auto* result = static_cast<GeneratedBricksData*>(std::malloc(sizeof(GeneratedBricksData)));
     if (result == nullptr)
     {
         return nullptr;
@@ -94,7 +94,7 @@ PLUGIN_EXPORT GeneratedBrickskData* plugin_generate_bricks(const BrickGenContext
     return result;
 }
 
-PLUGIN_EXPORT void plugin_free_bricks(GeneratedBrickskData* data)
+PLUGIN_EXPORT void plugin_free_bricks(GeneratedBricksData* data)
 {
     if (data == nullptr)
     {

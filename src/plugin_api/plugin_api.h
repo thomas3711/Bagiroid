@@ -21,7 +21,7 @@ typedef struct
     int count;
     BrickData* bricks;
 }
-GeneratedBrickskData;
+GeneratedBricksData;
 
 typedef struct
 {
@@ -37,8 +37,8 @@ BrickGenContext;
 
 // Define types for pointers to functions
 typedef int (*PluginApiVersionFn)(void);
-typedef GeneratedBrickskData* (*PluginGenerateFn)(const BrickGenContext* ctx);
-typedef void (*PluginFreeFn)(GeneratedBrickskData* data);
+typedef GeneratedBricksData* (*PluginGenerateFn)(const BrickGenContext* ctx);
+typedef void (*PluginFreeFn)(GeneratedBricksData* data);
 
 // Convenience export macros
 #if defined(_WIN32)

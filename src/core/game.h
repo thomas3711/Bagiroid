@@ -1,28 +1,28 @@
 #pragma once
+#include <memory>
 #include "scene.h"
 #include "ui.h"
 #include "level_generator.h"
 #include "player.h"
 
-#define APPLICATION_NAME "Bagiroid"
+inline constexpr const char* APPLICATION_NAME = "Bagiroid";
 
-// Master class that handles initialization, game state flow and 
+// Master class that handles initialization, game state flow and
 // everything that does not yet has its own place
 class Game
 {
 private:
-    // --- Singleton    
-    static Game* instance;    
-    Game();
+    // --- Singleton
+    Game() = default;
     Game(const Game&) = delete;
     Game& operator=(const Game&) = delete;
     // ---
-    
-    SDL_Renderer* renderer;
-    SDL_Window* window;
-    Scene* scene;
-    UI* ui;
-    LevelGenerator *level_generator;
+
+    SDL_Renderer* renderer = nullptr;
+    SDL_Window* window = nullptr;
+    std::unique_ptr<Scene> scene;
+    std::unique_ptr<UI> ui;
+    std::unique_ptr<LevelGenerator> level_generator;
 
     Player player;
 
@@ -46,7 +46,7 @@ private:
 
 public:
     static Game* GetInstance();
-    Scene* GetScene() { return scene; };
+    Scene* GetScene() { return scene.get(); };
 
     ~Game();
 
@@ -64,9 +64,9 @@ public:
     void NotifyBrickDestruction(Brick* brick);
 
     const SDL_Rect game_viewport = {0, 0, 1520, 1080};
-    const SDL_Rect infoViewport  = {game_viewport.w, 0, 400, 1080};
+    const SDL_Rect info_viewport  = {game_viewport.w, 0, 400, 1080};
 
-    const int window_width = game_viewport.w + infoViewport.w;
+    const int window_width = game_viewport.w + info_viewport.w;
     const int window_height = 1080;
 
     

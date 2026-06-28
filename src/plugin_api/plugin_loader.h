@@ -22,6 +22,6 @@ public:
     bool IsLoaded() const { return handle != nullptr; }
     const std::string& Path() const { return path; }
 
-    GeneratedBrickskData* Generate(const BrickGenContext& context) const;
-    void Free(GeneratedBrickskData* data) const;
+    GeneratedBricksData* Generate(const BrickGenContext& context) const;
+    void Free(GeneratedBricksData* data) const;
 };

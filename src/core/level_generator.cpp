@@ -8,7 +8,7 @@ bool LevelGenerator::LoadPlugin(const std::string& directory)
     return plugin.LoadFromDirectory(resolved);
 }
 
-void LevelGenerator::GenerateBricksData(const int& game_width, const int& game_height)
+void LevelGenerator::GenerateBricksData(int game_width, int game_height)
 {
     if (plugin.IsLoaded())
     {
@@ -28,11 +28,11 @@ void LevelGenerator::GenerateBricksData(const int& game_width, const int& game_h
     GenerateBricksDataBuiltin(game_width, game_height);
 }
 
-void LevelGenerator::GenerateBricksDataBuiltin(const int& game_width, const int& game_height)
+void LevelGenerator::GenerateBricksDataBuiltin(int game_width, int game_height)
 {
     int count = brick_count.x * brick_count.y;
 
-    data = new GeneratedBrickskData();
+    data = new GeneratedBricksData();
     data->count = count;
     data->bricks = new BrickData[count]();
 

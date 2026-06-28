@@ -7,13 +7,11 @@ int Ball::radius = Ball::default_radius;
 
 Ball::Ball()
 {
-    Game::GetInstance()->GetScene()->AddObject(this);
     reduce_lives_after_death = true;
 }
 
 Ball::Ball(bool reduce_lives_after_death_p)
 {
-    Game::GetInstance()->GetScene()->AddObject(this);
     reduce_lives_after_death = reduce_lives_after_death_p;
 }
 
@@ -24,7 +22,7 @@ Ball::~Ball()
 
 void Ball::Destroy()
 {
-    Game::GetInstance()->GetScene()->DestroyObject(this);
+    scene->DestroyObject(this);
     Game::GetInstance()->NotifyBallDestruction(this);
 }
 
@@ -76,9 +74,9 @@ void Ball::Update(float delta_time)
     }
 
     // Check collision and bounce against paddle
-    SDL_FRect paddle = Game::GetInstance()->GetScene()->GetPaddle().GetRectangle();
+    SDL_FRect paddle = scene->GetPaddle().GetRectangle();
     // Squash the paddle rectangle so we don't bounce from sides.
-    // As it caues all sorts of weird ball bounce behaviour in
+    // As it causes all sorts of weird ball bounce behaviour in
     // extremes that I don't want to deal with.
     paddle.h = 0;
 
@@ -92,7 +90,7 @@ void Ball::Update(float delta_time)
     }
 
     // Check collision with all bricks
-    const std::vector<Brick*>& bricks = Game::GetInstance()->GetScene()->GetBricks();
+    const std::vector<Brick*>& bricks = scene->GetBricks();
 
     for(int i = 0; i < bricks.size(); i++)
     {
@@ -109,7 +107,7 @@ void Ball::Update(float delta_time)
         }
     }
 
-    // Check if ball is bellow bottom 
+    // Check if ball is below bottom
     if(position.y > Game::GetInstance()->window_height + radius)
     {
         Destroy();
@@ -152,7 +150,7 @@ SDL_FPoint Ball::resolveRectCollision(const SDL_FRect& rect)
     return {nx, ny};
 }
 
-void Ball::bounce(SDL_FPoint& normal)
+void Ball::bounce(const SDL_FPoint& normal)
 {
     // Simple bounce that follows the rule: The Angle of Incidence equals the Angle of Reflection.
 

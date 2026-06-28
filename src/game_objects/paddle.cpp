@@ -108,7 +108,7 @@ void Paddle::GiveBall()
 {
     if(ball == nullptr)
     {
-        ball = new Ball();
+        ball = scene->CreateObject<Ball>();
 
         updateBallPosition();
     }

@@ -21,7 +21,6 @@ void Powerup::Spawn(SDL_FPoint& position_p)
 {
     SetActive(true);
     position = position_p;
-    Game::GetInstance()->GetScene()->AddObject(this);
 
     // This type of power-up doesn't need to be picked up, just kill it and trigger effect
     if(type == Type::spawnBalls)
@@ -53,7 +52,7 @@ void Powerup::Update(float delta_time)
     position.y += speed * delta_time;
 
     // Check collision and against paddle
-    SDL_FRect paddle = Game::GetInstance()->GetScene()->GetPaddle().GetRectangle();
+    SDL_FRect paddle = scene->GetPaddle().GetRectangle();
 
     if(Physics::isSphereCollidingWithRect(position, radius, paddle))
     {
@@ -74,7 +73,7 @@ void Powerup::Update(float delta_time)
 void Powerup::Destroy()
 {
     active = false;
-    Game::GetInstance()->GetScene()->DestroyObject(this);
+    scene->DestroyObject(this);
 }
 
 std::string Powerup::GetDescription(Type type)
@@ -138,10 +137,10 @@ void Powerup::triggerEffect()
             Ball::IncreaseRadius();
             break;
         case Type::fasterPaddle:
-            Game::GetInstance()->GetScene()->GetPaddle().IncreaseSpeed();
+            scene->GetPaddle().IncreaseSpeed();
             break;
         case Type::biggerPaddle:
-            Game::GetInstance()->GetScene()->GetPaddle().IncreaseWidth();
+            scene->GetPaddle().IncreaseWidth();
             break;
         case Type::spawnBalls:
             spawnBallsEffect(position);
@@ -168,7 +167,7 @@ void Powerup::spawnBallsEffect(SDL_FPoint position)
     {
         float angle = base_angle + i * angle_step;
 
-        Ball* ball = new Ball(false);
+        Ball* ball = scene->CreateObject<Ball>(false);
 
         SDL_FPoint spawn_position = position;
         ball->SetPosition(spawn_position);

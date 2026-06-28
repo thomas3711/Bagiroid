@@ -2,24 +2,24 @@
 #include <SDL3/SDL.h>
 #include <vector>
 #include <queue>
+#include <memory>
+#include <utility>
 #include "object.h"
 #include "paddle.h"
 #include "brick.h"
 #include "plugin_api.h"
 
-#define MAX_BRICKS 4096
+inline constexpr int MAX_BRICKS = 4096;
 
 // Container and management class for all game objects.
 class Scene
 {
 private:
-    std::vector<Object*> objects;
+    std::vector<std::unique_ptr<Object>> objects;
 
     std::queue<Object*> destroy_queue;
 
     Paddle paddle = Paddle();
-
-    bool debug_print = true;
 
     // Cached list of bricks
     std::vector<Brick*> brick_cache;
@@ -31,12 +31,21 @@ public:
     void Update(float delta_time);
     void Render(SDL_Renderer* renderer);
 
-    void AddObject(Object* object_to_add);
+    Object* AddObject(std::unique_ptr<Object> object_to_add);
     void RemoveObject(Object* object_to_remove);
     void DestroyObject(Object* object_to_destroy);
     void DeleteAll();
-    void AddBricks(GeneratedBrickskData* data);
-    
+    void AddBricks(const GeneratedBricksData* data);
+
+    template <typename T, typename... Args>
+    T* CreateObject(Args&&... args)
+    {
+        auto object = std::make_unique<T>(std::forward<Args>(args)...);
+        T* observer = object.get();
+        AddObject(std::move(object));
+        return observer;
+    }
+
     int GetActiveBricksCount();
 
     const std::vector<Brick*>& GetBricks();
@@ -47,14 +56,13 @@ public:
     {
         for (auto it = objects.begin(); it != objects.end(); )
         {
-            if (dynamic_cast<T*>(*it) != nullptr)
+            if (dynamic_cast<T*>(it->get()) != nullptr)
             {
-                if (!brick_cache_dirty && dynamic_cast<Brick*>(*it))
+                if (!brick_cache_dirty && dynamic_cast<Brick*>(it->get()))
                 {
                     brick_cache_dirty = true;
                 }
 
-                delete *it;
                 it = objects.erase(it);
             }
             else
@@ -68,9 +76,9 @@ public:
     {
         std::vector<T*> result;
 
-        for (Object* object : objects)
+        for (const std::unique_ptr<Object>& object : objects)
         {
-            if (T* casted = dynamic_cast<T*>(object))
+            if (T* casted = dynamic_cast<T*>(object.get()))
             {
                 result.push_back(casted);
             }

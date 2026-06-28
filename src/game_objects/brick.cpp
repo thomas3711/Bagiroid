@@ -34,17 +34,14 @@ void Brick::Destroy()
 {
     SetActive(false);
     Game::GetInstance()->NotifyBrickDestruction(this);
-    Game::GetInstance()->GetScene()->DestroyObject(this);
+    scene->DestroyObject(this);
 
     if(powerup_type > Powerup::Type::none && powerup_type < Powerup::Type::COUNT)
     {
-        Powerup* powerup = new Powerup(powerup_type);
+        Powerup* powerup = scene->CreateObject<Powerup>(powerup_type);
 
-        if(powerup != nullptr)
-        {
-            SDL_FPoint position { .x = rectangle.x + rectangle.w / 2.0f, .y = rectangle.y + rectangle.h / 2.0f };
-            powerup->Spawn(position);
-            powerup_type = Powerup::Type::none;
-        }
+        SDL_FPoint position { .x = rectangle.x + rectangle.w / 2.0f, .y = rectangle.y + rectangle.h / 2.0f };
+        powerup->Spawn(position);
+        powerup_type = Powerup::Type::none;
     }
 }

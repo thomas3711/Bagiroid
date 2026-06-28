@@ -118,7 +118,7 @@ void PluginLoader::Unload()
     free_fn = nullptr;
 }
 
-GeneratedBrickskData* PluginLoader::Generate(const BrickGenContext& context) const
+GeneratedBricksData* PluginLoader::Generate(const BrickGenContext& context) const
 {
     if (generate_fn == nullptr)
     {
@@ -128,7 +128,7 @@ GeneratedBrickskData* PluginLoader::Generate(const BrickGenContext& context) con
     return generate_fn(&context);
 }
 
-void PluginLoader::Free(GeneratedBrickskData* data) const
+void PluginLoader::Free(GeneratedBricksData* data) const
 {
     if (free_fn != nullptr && data != nullptr)
     {

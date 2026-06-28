@@ -13,19 +13,20 @@ public:
     const SDL_FPoint brick_spacing{.x = 12, .y = 12};
     const SDL_FPoint brick_count{.x = 8, .y = 6};
 
-    GeneratedBrickskData* data = nullptr;
-
     bool LoadPlugin(const std::string& directory = "plugins");
 
-    void GenerateBricksData(const int& game_width, const int& game_height);
+    void GenerateBricksData(int game_width, int game_height);
     void FreeBricksData();
 
+    const GeneratedBricksData* GetData() const { return data; };
 
     SDL_Color GetBrickColor(int row);
     int GetBrickPoints(int row);
 
 private:
-    void GenerateBricksDataBuiltin(const int& game_width, const int& game_height);
+    void GenerateBricksDataBuiltin(int game_width, int game_height);
+
+    GeneratedBricksData* data = nullptr;
 
     PluginLoader plugin;
     bool data_from_plugin = false;

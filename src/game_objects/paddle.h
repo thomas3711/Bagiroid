@@ -2,6 +2,8 @@
 #include <SDL3/SDL.h>
 #include "ball.h"
 
+class Scene;
+
 // Player controlled paddle at the bottom of the screen.
 // Handles input, control, update and render of the paddle
 class Paddle
@@ -26,8 +28,13 @@ class Paddle
     bool control_enabled = true;
 
     Ball* ball = nullptr;
+
+    // Doesn't own
+    Scene* scene = nullptr;
 public:
     Paddle();
+
+    void SetScene(Scene* owning_scene) { scene = owning_scene; };
 
     void Render(SDL_Renderer* renderer);
     void Update(float delta_time);

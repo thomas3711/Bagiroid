@@ -11,11 +11,11 @@ int main(int argc, char* argv[])
 
     while (game->IsApplicationRunning())
     {
-        game->GetInstance()->Update();
-        game->GetInstance()->Render();
+        game->Update();
+        game->Render();
     }
 
-    game->GetInstance()->Quit();
+    game->Quit();
 
     return 0;
 }
