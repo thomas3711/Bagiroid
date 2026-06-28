@@ -176,6 +176,6 @@ void Powerup::spawnBallsEffect(SDL_FPoint position)
         SDL_FPoint direction;
         direction.x = SDL_cosf(angle);
         direction.y = SDL_sinf(angle);
-        ball->Launch(direction);
+        ball->Launch(direction, 0.5f);
     }
 }

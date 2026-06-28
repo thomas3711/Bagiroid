@@ -46,6 +46,11 @@ void Scene::Render(SDL_Renderer* renderer)
 void Scene::AddObject(Object* object_to_add)
 {
     objects.push_back(object_to_add);
+
+    if (dynamic_cast<Brick*>(object_to_add))
+    {
+        brick_cache_dirty = true;
+    }
 }
 
 void Scene::RemoveObject(Object* object_to_remove)
@@ -54,6 +59,11 @@ void Scene::RemoveObject(Object* object_to_remove)
     if (iterator != objects.end())
     {
         objects.erase(iterator);
+
+        if (dynamic_cast<Brick*>(object_to_remove))
+        {
+            brick_cache_dirty = true;
+        }
     }
 }
 
@@ -69,6 +79,7 @@ void Scene::DeleteAll()
         delete object;
     }
     objects.clear();
+    brick_cache_dirty = true;
 
     std::queue<Object*> empty;
     std::swap(destroy_queue, empty);
@@ -94,9 +105,29 @@ void Scene::AddBricks(GeneratedBrickskData* data)
     }
 }
 
+const std::vector<Brick*>& Scene::GetBricks()
+{
+    if (brick_cache_dirty)
+    {
+        brick_cache.clear();
+
+        for (Object* object : objects)
+        {
+            if (Brick* brick = dynamic_cast<Brick*>(object))
+            {
+                brick_cache.push_back(brick);
+            }
+        }
+
+        brick_cache_dirty = false;
+    }
+
+    return brick_cache;
+}
+
 int Scene::GetActiveBricksCount()
 {
-    auto bricks = GetAllOfType<Brick>();
+    const std::vector<Brick*>& bricks = GetBricks();
 
     int total_active_bricks = 0;
 

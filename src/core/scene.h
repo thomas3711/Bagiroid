@@ -7,7 +7,7 @@
 #include "brick.h"
 #include "plugin_api.h"
 
-#define MAX_BRICKS 512
+#define MAX_BRICKS 4096
 
 // Container and management class for all game objects.
 class Scene
@@ -20,6 +20,10 @@ private:
     Paddle paddle = Paddle();
 
     bool debug_print = true;
+
+    // Cached list of bricks
+    std::vector<Brick*> brick_cache;
+    bool brick_cache_dirty = true;
 
 public:
     Scene();
@@ -35,6 +39,8 @@ public:
     
     int GetActiveBricksCount();
 
+    const std::vector<Brick*>& GetBricks();
+
     Paddle& GetPaddle() { return paddle; };
 
     template <typename T> void DeleteAllOfType()
@@ -43,6 +49,11 @@ public:
         {
             if (dynamic_cast<T*>(*it) != nullptr)
             {
+                if (!brick_cache_dirty && dynamic_cast<Brick*>(*it))
+                {
+                    brick_cache_dirty = true;
+                }
+
                 delete *it;
                 it = objects.erase(it);
             }

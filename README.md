@@ -38,8 +38,9 @@ This produces the `bagiroid` executable in `build/`, and builds the example plug
 
 ## Potential Improvements
 - Smooth/Antialiased ball drawing
-- Faster collision checks (every ball checks all the bricks) - quadtree
+- Balls should only check close bricks not all of them - quadtree, hash grid
 - Expose other settings (player, paddle, ball) to plugins
+- Textures, Audio
 
 ## Architecture
 

@@ -72,7 +72,7 @@ void Paddle::Update(float delta_time)
         ball_direction.x = paddle_direction;
         ball_direction.y = -1;
 
-        ball->Launch(ball_direction);
+        ball->Launch(ball_direction, 1.0f);
         ball = nullptr;
     }
     

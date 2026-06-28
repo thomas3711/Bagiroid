@@ -20,7 +20,7 @@ class Ball : public Object
     SDL_FPoint checkScreenEdgeCollision();
     void bounce(SDL_FPoint& normal);
     void bounceOffPaddle(const SDL_FRect& paddle);
-    SDL_FPoint getRectCollisionNormal(const SDL_FRect& rect);
+    SDL_FPoint resolveRectCollision(const SDL_FRect& rect);
 
 public:
 
@@ -28,7 +28,7 @@ public:
     Ball(bool reduce_lives_after_death_p);
     ~Ball() override;
 
-    void Launch(SDL_FPoint& direction);
+    void Launch(SDL_FPoint& direction, float speed_factor);
     void SetPosition(SDL_FPoint& target_position);
 
     void Render(SDL_Renderer* renderer) override;

@@ -6,12 +6,12 @@
 
 namespace
 {
-    constexpr int columns = 30;
-    constexpr int rows = 6;
-    constexpr float brick_width = 26.0f;
-    constexpr float brick_height = 26.0f;
-    constexpr float spacing_x = 10.0f;
-    constexpr float spacing_y = 12.0f;
+    constexpr int columns = 128;
+    constexpr int rows = 32;
+    constexpr float brick_width = 8.0f;
+    constexpr float brick_height = 8.0f;
+    constexpr float spacing_x = 2.0f;
+    constexpr float spacing_y = 6.0f;
     constexpr float top_offset = 96.0f;
 }
 
@@ -56,7 +56,7 @@ PLUGIN_EXPORT GeneratedBrickskData* plugin_generate_bricks(const BrickGenContext
 
             brick.points = 1000;
 
-            auto roll = std::rand() % 3;
+            auto roll = std::rand() % 5;
 
             if(roll == 0)
             {
@@ -72,11 +72,18 @@ PLUGIN_EXPORT GeneratedBrickskData* plugin_generate_bricks(const BrickGenContext
                 brick.b = 255;
                 brick.powerup = 4;
             }
-            else
+            else if (roll == 2)
             {
                 brick.r = 0;
                 brick.g = 255;
                 brick.b = 0;
+                brick.powerup = 3;
+            }
+            else
+            {
+                brick.r = 64;
+                brick.g = 64;
+                brick.b = 64;
                 brick.powerup = 3;
             }
 

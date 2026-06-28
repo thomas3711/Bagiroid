@@ -39,18 +39,10 @@ void Ball::SetPosition(SDL_FPoint& target_position)
     position.y = target_position.y;
 }
 
-void Ball::Launch(SDL_FPoint& direction)
+void Ball::Launch(SDL_FPoint& direction, float speed_factor)
 {
-    velocity.x = direction.x * speed;
-    velocity.y = direction.y * speed;
-
-    // Make the powerup balls slower
-    // TODO: do this in a more inteligent customizable way
-    if(!reduce_lives_after_death)
-    {
-        velocity.x /= 2.0f;
-        velocity.y /= 2.0f;
-    }
+    velocity.x = direction.x * speed * speed_factor;
+    velocity.y = direction.y * speed * speed_factor;
 }
 
 void Ball::Render(SDL_Renderer* renderer)
@@ -92,22 +84,15 @@ void Ball::Update(float delta_time)
 
     if(Physics::isSphereCollidingWithRect(position, radius, paddle))
     {
-        // TODO: encapsulate to collider with rectangle (or something so it is not copied in brick check)
-        SDL_FPoint normal = getRectCollisionNormal(paddle);
-        
-        // Find closest point and push ball outside
-        float closest_x = SDL_clamp(position.x, paddle.x, paddle.x + paddle.w);
-        float closest_y = SDL_clamp(position.y, paddle.y, paddle.y + paddle.h);
-
-        position.x = closest_x + normal.x * radius;
-        position.y = closest_y + normal.y * radius;
+        // Push ball outside the paddle (normal not needed here, paddle has its own bounce)
+        resolveRectCollision(paddle);
 
         // Calculate and set bounce velocity based on where the ball hit the paddle
         bounceOffPaddle(paddle);
     }
 
     // Check collision with all bricks
-    auto bricks = Game::GetInstance()->GetScene()->GetAllOfType<Brick>();
+    const std::vector<Brick*>& bricks = Game::GetInstance()->GetScene()->GetBricks();
 
     for(int i = 0; i < bricks.size(); i++)
     {
@@ -116,17 +101,8 @@ void Ball::Update(float delta_time)
 
         if(brick->IsActive() && Physics::isSphereCollidingWithRect(position, radius, rectangle))
         {
-            // TODO: encapsulate to collider with rectangle (or something so it is not copied in paddle check)
-            SDL_FPoint normal = getRectCollisionNormal(rectangle);
-            
-            // Find closest point and push ball outside
-            float closest_x = SDL_clamp(position.x, rectangle.x, rectangle.x + rectangle.w);
-            float closest_y = SDL_clamp(position.y, rectangle.y, rectangle.y + rectangle.h);
-
-            position.x = closest_x + normal.x * radius;
-            position.y = closest_y + normal.y * radius;
-            
-            // Calculate and set bounce velocity
+            // Push ball outside the brick and bounce off the resulting normal
+            SDL_FPoint normal = resolveRectCollision(rectangle);
             bounce(normal);
 
             brick->Destroy();
@@ -152,23 +128,27 @@ SDL_FPoint Ball::checkScreenEdgeCollision()
     return {0.0f, 0.0f};          // no collision
 }
 
-SDL_FPoint Ball::getRectCollisionNormal(const SDL_FRect& rect)
+SDL_FPoint Ball::resolveRectCollision(const SDL_FRect& rect)
 {
     // Find closest point on rectangle to circle center
     float closest_x = SDL_clamp(position.x, rect.x, rect.x + rect.w);
     float closest_y = SDL_clamp(position.y, rect.y, rect.y + rect.h);
-    
+
     // Vector from closest point to ball center (collision normal direction)
     float nx = position.x - closest_x;
     float ny = position.y - closest_y;
-    
+
     // Normalize the normal vector
     float length = SDL_sqrt(nx*nx + ny*ny);
     if (length > 0.0f) {
         nx /= length;
         ny /= length;
     }
-    
+
+    // Push ball outside the rectangle along the normal
+    position.x = closest_x + nx * radius;
+    position.y = closest_y + ny * radius;
+
     return {nx, ny};
 }
 
