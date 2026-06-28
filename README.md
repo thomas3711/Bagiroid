@@ -40,7 +40,7 @@ This produces the `bagiroid` executable in `build/`, and builds the example plug
 - Smooth/Antialiased ball drawing
 - Balls should only check close bricks not all of them - quadtree, hash grid
 - Expose other settings (player, paddle, ball) to plugins
-- Paddle, Powerup & Ball call access functionality and data via Game::GetInstance() (should be refactored)
+- Paddle, Powerup & Ball access functionality and data via Game::GetInstance() (should be refactored)
 - Textures, Audio
 
 ## Architecture
