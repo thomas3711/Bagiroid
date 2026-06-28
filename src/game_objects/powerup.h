@@ -29,6 +29,7 @@ private:
 
     SDL_FPoint position;
     SDL_Color color;
+    SDL_Point game_viewport;
 
     void triggerEffect();
     void spawnBallsEffect(SDL_FPoint position);

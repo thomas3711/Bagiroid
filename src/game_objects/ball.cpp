@@ -5,14 +5,12 @@
 
 int Ball::radius = Ball::default_radius;
 
-Ball::Ball()
-{
-    reduce_lives_after_death = true;
-}
-
 Ball::Ball(bool reduce_lives_after_death_p)
 {
     reduce_lives_after_death = reduce_lives_after_death_p;
+
+    game_viewport.x = Game::GetInstance()->game_viewport.w;
+    game_viewport.y = Game::GetInstance()->game_viewport.h;
 }
 
 Ball::~Ball()
@@ -108,7 +106,7 @@ void Ball::Update(float delta_time)
     }
 
     // Check if ball is below bottom
-    if(position.y > Game::GetInstance()->window_height + radius)
+    if(position.y > game_viewport.y + radius)
     {
         Destroy();
     }

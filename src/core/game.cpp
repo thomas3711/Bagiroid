@@ -21,7 +21,7 @@ void Game::Initialize(int argc, char* argv[])
     renderer = SDL_CreateRenderer(window, nullptr);
     SDL_SetRenderLogicalPresentation(renderer, window_width, window_height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
-    // Enable vsync so the main loop doesn't busy-wait and peg a CPU core.
+    // Enable vsync so the main loop doesn't busy-wait
     SDL_SetRenderVSync(renderer, 1);
 
     scene = std::make_unique<Scene>();

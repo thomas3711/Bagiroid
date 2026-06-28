@@ -34,9 +34,10 @@ private:
 
     bool plugins_loaded = false;
 
-    Uint64 last_frame_time;
+    Uint64 last_frame_time = 0;
 
     SDL_Event event;
+
 
     // Game
     void nextLevel();
@@ -46,7 +47,7 @@ private:
 
 public:
     static Game* GetInstance();
-    Scene* GetScene() { return scene.get(); };
+    Scene* GetScene() const { return scene.get(); };
 
     ~Game();
 
@@ -58,7 +59,7 @@ public:
     void IncreaseScoreMultiplier() { player.score_multiplier += 1; };
     void IncreaseLives() { player.lives++; };
 
-    bool IsApplicationRunning() { return application_running; };
+    bool IsApplicationRunning() const { return application_running; };
 
     void NotifyBallDestruction(Ball* ball);
     void NotifyBrickDestruction(Brick* brick);
@@ -66,8 +67,8 @@ public:
     const SDL_Rect game_viewport = {0, 0, 1520, 1080};
     const SDL_Rect info_viewport  = {game_viewport.w, 0, 400, 1080};
 
+private:
+    // Fixed 1680x1080
     const int window_width = game_viewport.w + info_viewport.w;
     const int window_height = 1080;
-
-    
 };

@@ -9,6 +9,7 @@ class Ball : public Object
     static constexpr int radius_increase = 1;
     static constexpr int max_radius = 128;
 
+    // All balls will have the same radius for convenience
     static int radius;
 
     float speed = 1000.0f;
@@ -16,6 +17,7 @@ class Ball : public Object
 
     SDL_FPoint position { 0.0f, 0.0f };
     SDL_FPoint velocity { 0.0f, 0.0f };
+    SDL_Point game_viewport;
 
     SDL_FPoint checkScreenEdgeCollision();
     void bounce(const SDL_FPoint& normal);
@@ -24,8 +26,7 @@ class Ball : public Object
 
 public:
 
-    Ball();
-    Ball(bool reduce_lives_after_death_p);
+    Ball(bool reduce_lives_after_death_p = true);
     ~Ball() override;
 
     void Launch(SDL_FPoint& direction, float speed_factor);

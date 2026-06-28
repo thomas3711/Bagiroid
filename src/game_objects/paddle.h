@@ -29,7 +29,7 @@ class Paddle
 
     Ball* ball = nullptr;
 
-    // Doesn't own
+    // Doesn't own. Don't touch in constructor, is initialized when added to scene
     Scene* scene = nullptr;
 public:
     Paddle();

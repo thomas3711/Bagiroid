@@ -10,6 +10,9 @@ Powerup::Powerup(Type type_p)
     active = false;
     color = GetColor(type);
     speed = default_speed + (int(Type::COUNT) - int(type)) * speed_increment;
+
+    game_viewport.x = Game::GetInstance()->game_viewport.w;
+    game_viewport.y = Game::GetInstance()->game_viewport.h;
 }
 
 Powerup::~Powerup()
@@ -64,7 +67,7 @@ void Powerup::Update(float delta_time)
         triggerEffect();
         Destroy();
     }
-    else if(position.y > Game::GetInstance()->window_height + radius)
+    else if(position.y > game_viewport.y + radius)
     {
         Destroy();
     }
